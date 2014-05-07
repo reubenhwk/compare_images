@@ -130,7 +130,7 @@ image are set to the value of the closest image pixel.
 void ConvHorizontal(vector<float>& image, int width, int height, float *kernel, int ksize)
 {
   int rows, cols, r, c, i, halfsize;
-  float buffer[4000];
+  vector<float> buffer;
   vector<float> pixels(width*height);
 
 
@@ -139,8 +139,8 @@ void ConvHorizontal(vector<float>& image, int width, int height, float *kernel, 
 
   halfsize = ksize / 2;
   pixels = image;
-  assert(cols + ksize < 4000);
 
+  buffer.resize(ksize + cols);
   for (r = 0; r < rows; r++) {
     /* Copy the row into buffer with pixels at ends replicated for
     half the mask size.  This avoids need to check for ends
@@ -152,7 +152,7 @@ void ConvHorizontal(vector<float>& image, int width, int height, float *kernel, 
     for (i = 0; i < halfsize; i++)
       buffer[halfsize + cols + i] = pixels[r*cols+cols-1];
 
-    ConvBufferFast(buffer, kernel, cols, ksize);
+    ConvBufferFast(&buffer[0], kernel, cols, ksize);
     for (c = 0; c < cols; c++)
       pixels[r*cols+c] = buffer[c];
   }
@@ -165,7 +165,7 @@ void ConvHorizontal(vector<float>& image, int width, int height, float *kernel, 
 void ConvVertical(vector<float>& image, int width, int height, float *kernel, int ksize)
 {
   int rows, cols, r, c, i, halfsize;
-  float buffer[4000];
+  vector<float> buffer;
   vector<float> pixels(width*height);
 
   rows = height;
@@ -173,8 +173,8 @@ void ConvVertical(vector<float>& image, int width, int height, float *kernel, in
 
   halfsize = ksize / 2;
   pixels = image;
-  assert(rows + ksize < 4000);
 
+  buffer.resize(ksize + rows);
   for (c = 0; c < cols; c++) {
     for (i = 0; i < halfsize; i++)
       buffer[i] = pixels[c];
@@ -183,7 +183,7 @@ void ConvVertical(vector<float>& image, int width, int height, float *kernel, in
     for (i = 0; i < halfsize; i++)
       buffer[halfsize + rows + i] = pixels[(rows - 1)*cols+c];
 
-    ConvBufferFast(buffer, kernel, rows, ksize);
+    ConvBufferFast(&buffer[0], kernel, rows, ksize);
     for (r = 0; r < rows; r++)
       pixels[r*cols+c] = buffer[r];
   }
