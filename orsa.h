@@ -16,8 +16,8 @@
 
 #include <vector>
 
-#include "libNumerics/numerics.h"
-#include "libMatch/match.h"
+#include "lib/numerics/numerics.h"
+#include "lib/match/match.h"
 #include <sstream>
 #include <iostream>
 #include <fstream>

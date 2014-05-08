@@ -51,7 +51,7 @@ using namespace std;
 #endif
 
 #include "demo_lib_sift.h"
-#include "io_png/io_png.h"
+#include "lib/io_png/io_png.h"
 
 #include "library.h"
 #include "frot.h"
