@@ -17,12 +17,12 @@
 #include <math.h>
 #include <time.h>
 #include "orsa.h"
-#include <third_party/Eigen/Cholesky>
-#include <third_party/Eigen/Core>
-#include <third_party/Eigen/Eigenvalues>
-#include <third_party/Eigen/LU>
-#include <third_party/Eigen/QR>
-#include <third_party/Eigen/SVD>
+#include <eigen3/Eigen/Cholesky>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Eigenvalues>
+#include <eigen3/Eigen/LU>
+#include <eigen3/Eigen/QR>
+#include <eigen3/Eigen/SVD>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
