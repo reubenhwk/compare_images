@@ -81,49 +81,18 @@
 	scale:		s
 	orientation:	angle
 	descriptor:	array of gradient orientation histograms in a neighbors */
-struct keypoint {
+template<typename T>
+struct keypoint_template {
 	float	x,y,
 		scale,
 		angle;
-	float	vec[VecLength];
+	T vec[VecLength];
 };
 
-
-/* Keypoint structure:
- position:	x,y
- scale:		s
- orientation:	angle
- descriptor:	array of gradient orientation histograms in a neighbors */
-struct keypoint_char {
-	float	x,y,
-	scale,
-	angle;
-	unsigned char	vec[VecLength];
-};
-
-/* Keypoint structure:
- position:	x,y
- scale:		s
- orientation:	angle
- descriptor:	array of gradient orientation histograms in a neighbors */
-struct keypoint_short {
-	float	x,y,
-	scale,
-	angle;
-	unsigned short	vec[VecLength];
-};
-
-/* Keypoint structure:
- position:	x,y
- scale:		s
- orientation:	angle
- descriptor:	array of gradient orientation histograms in a neighbors */
-struct keypoint_int {
-	float	x,y,
-	scale,
-	angle;
-	unsigned int	vec[VecLength];
-};
+typedef keypoint_template<float> keypoint;
+typedef keypoint_template<unsigned int> keypoint_int;
+typedef keypoint_template<unsigned short> keypoint_short;
+typedef keypoint_template<unsigned char> keypoint_char;
 
 /* List of keypoints: just use the standard class vector: */
 typedef std::vector<keypoint> keypointslist;
