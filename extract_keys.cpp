@@ -172,16 +172,16 @@ int main(int argc, char **argv)
 	if (file_key1.is_open()) {
 		// Follow the same convention of David Lowe:
 		// the first line contains the number of keypoints and the length of the desciptors (128)
-		file_key1 << num_keys1 << "  " << VecLength << "  " << std::endl;
+		file_key1 << num_keys1 << ' ' << VecLength << ' ' << std::endl;
 		for (int tt = 0; tt < (int)keys1.size(); tt++) {
 			for (int rr = 0; rr < (int)keys1[tt].size(); rr++) {
 				keypointslist::iterator ptr = keys1[tt][rr].begin();
 				for (int i = 0; i < (int)keys1[tt][rr].size(); i++, ptr++) {
-					file_key1 << zoom1 * ptr->x << "  " << zoom1 * ptr->y << "  " << zoom1 *
-					    ptr->scale << "  " << ptr->angle;
+					file_key1 << zoom1 * ptr->x << ' ' << zoom1 * ptr->y << ' ';
+					file_key1 << zoom1 * ptr->scale << ' ' << ptr->angle;
 
 					for (int ii = 0; ii < (int)VecLength; ii++) {
-						file_key1 << "  " << ptr->vec[ii];
+						file_key1 << ' ' << ptr->vec[ii];
 					}
 
 					file_key1 << std::endl;
