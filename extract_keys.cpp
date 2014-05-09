@@ -93,8 +93,8 @@ int main(int argc, char **argv)
 	float wS = IM_X;
 	float hS = IM_Y;
 
-	float zoom1 = 0, zoom2 = 0;
-	int wS1 = 0, hS1 = 0, wS2 = 0, hS2 = 0;
+	float zoom1 = 0;
+	int wS1 = 0, hS1 = 0;
 	vector < float >ipixels1_zoom;
 
 	cout << "WARNING: The input images are resized to " << wS << "x" << hS << " for ASIFT. " << endl
