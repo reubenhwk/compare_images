@@ -124,12 +124,12 @@ void KeySample(
 	const flimage& grad, const flimage& ori,
 	float scale, float row, float col,siftPar &par);
 
-void AddSample(
+inline void AddSample(
 	float index[IndexSize][IndexSize][OriSize], keypoint& key,
 	const flimage& grad, const flimage& orim,
 	float r, float c, float rpos, float cpos, float rx, float cx,siftPar &par);
 
-void PlaceInIndex(
+inline void PlaceInIndex(
 	float index[IndexSize][IndexSize][OriSize],
 	float mag, float ori, float rx, float cx,siftPar &par);
 
@@ -961,7 +961,7 @@ void KeySample(
 
 /* Given a sample from the image gradient, place it in the index array.
 */
-void AddSample(
+inline void AddSample(
 	float index[IndexSize][IndexSize][OriSize], keypoint& key,
 	const flimage& grad, const flimage& orim,
 	float r, float c, float rpos, float cpos, float rx, float cx,siftPar &par)
@@ -999,7 +999,7 @@ void AddSample(
 /* Increment the appropriate locations in the index to incorporate
    this image sample.  The location of the sample in the index is (rx,cx).
 */
-void PlaceInIndex(
+inline void PlaceInIndex(
 	float index[IndexSize][IndexSize][OriSize],
 	float mag, float ori, float rx, float cx,siftPar &par)
 {
@@ -1062,7 +1062,7 @@ void PlaceInIndex(
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-float DistSquared(keypoint &k1,keypoint &k2, float tdist, siftPar &par)
+inline float DistSquared(keypoint const &k1, keypoint const &k2, float const tdist, siftPar const &par)
 {
 
 	float dif;
@@ -1072,9 +1072,9 @@ float DistSquared(keypoint &k1,keypoint &k2, float tdist, siftPar &par)
 
 	if (ABS(k1.x - k2.x) > par.MatchXradius || ABS(k1.y - k2.y) > par.MatchYradius) return tdist;
 
+	float const *ik1 = k1.vec;
+	float const *ik2 = k2.vec;
 
-	float *ik1 = k1.vec;
-	float *ik2 = k2.vec;
 
 	for (int i = 0; i < VecLength && distsq <= tdist; i++) {
 //    for (int i = 0; i < VecLength ; i++) {
@@ -1089,7 +1089,7 @@ float DistSquared(keypoint &k1,keypoint &k2, float tdist, siftPar &par)
 	return distsq;
 }
 
-float DistSquared_short(keypoint_short &k1,keypoint_short &k2, float tdist, siftPar &par)
+inline float DistSquared_short(keypoint_short const &k1, keypoint_short const &k2, float const tdist, siftPar const &par)
 {
 	// For Mac/Linux compilation using make: vectorization is possible with short.
 	unsigned short distsq = 0;
@@ -1099,9 +1099,9 @@ float DistSquared_short(keypoint_short &k1,keypoint_short &k2, float tdist, sift
 
 	if (ABS(k1.x - k2.x) > par.MatchXradius || ABS(k1.y - k2.y) > par.MatchYradius) return tdist;
 
+	unsigned short const *ik1 = k1.vec;
+	unsigned short const *ik2 = k2.vec;
 
-	unsigned short *ik1 = k1.vec;
-	unsigned short *ik2 = k2.vec;
 
 	for (int i = 0; i < VecLength ; i++) {
 		distsq += ((ik1[i] > ik2[i]) ? (ik1[i] - ik2[i]) : (-ik1[i] + ik2[i]));
@@ -1117,8 +1117,7 @@ float DistSquared_short(keypoint_short &k1,keypoint_short &k2, float tdist, sift
    closest and next to closest keypoints in klist, while bestindex is the index
    of the closest keypoint.
 */
-float CheckForMatch(
-	 keypoint& key, keypointslist& klist, int& min,siftPar &par)
+inline float CheckForMatch(keypoint const& key, keypointslist const& klist, int& min, siftPar &par)
 {
 	int	nexttomin = -1;
 	float	dsq, distsq1, distsq2;
@@ -1142,8 +1141,7 @@ float CheckForMatch(
 	return distsq1/distsq2 ;
 }
 
-float CheckForMatch_short(
-					keypoint_short& key, keypointslist_short& klist, int& min,siftPar &par)
+inline float CheckForMatch_short(keypoint_short const& key, keypointslist_short const& klist, int& min, siftPar const &par)
 {
 	int	nexttomin = -1;
 	float	dsq, distsq1, distsq2;
@@ -1164,7 +1162,7 @@ float CheckForMatch_short(
 		}
 	}
 
-	return distsq1/distsq2 ;
+	return distsq1/distsq2;
 }
 
 
