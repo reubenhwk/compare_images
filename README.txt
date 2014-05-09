@@ -1,4 +1,14 @@
 Demo code for Affine-SIFT (ASIFT) image matching
+
+This code was found from this webpage...
+
+http://www.cmap.polytechnique.fr/~yu/research/ASIFT/demo.html
+
+I'm attempting to use this code to generate key files for all the images
+in my Picutes folder, then I'm going to try to find matches.  The rest of
+the (unmodified) README.txt is as follows...
+
+Demo code for Affine-SIFT (ASIFT) image matching
 -------------------------------------------------------------------------
 -------------------------------------------------------------------------
 Jean-Michel Morel (Jean-Michel Morel <morel@cmla.ens-cachan.fr>)
