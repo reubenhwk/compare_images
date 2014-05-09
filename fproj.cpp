@@ -27,30 +27,30 @@ void fproj(vector<float>& in, vector<float>& out, int nx, int ny, int *sx, int *
 
 
   /* CHECK ORDER */
-  if (*o!=0 && *o!=1 && *o!=-3 && 
+  if (*o!=0 && *o!=1 && *o!=-3 &&
       *o!=3 && *o!=5 && *o!=7 && *o!=9 && *o!=11)
   /*  mwerror(FATAL,1,"unrecognized interpolation order.\n"); */
-  {	
+  {
 	  printf("unrecognized interpolation order.\n");
 	  exit(-1);
   }
 
   /* ALLOCATE NEW IMAGE */
 /*  nx = in->ncol; ny = in->nrow; */
-/*  out = mw_change_fimage(out,*sy,*sx); 
+/*  out = mw_change_fimage(out,*sy,*sx);
   if (!out) mwerror(FATAL,1,"not enough memory\n"); */
 
 
   if (*o>=3) {
 /*    coeffs = mw_new_fimage();
     finvspline(in,*o,coeffs); */
-	  
+
 //	  coeffs = new float[nx*ny];
-	  
+
 	  coeffs = vector<float>(nx*ny);
-	  
+
 	finvspline(in,*o,coeffs,nx,ny);
-	  
+
     ref = coeffs;
     if (*o>3) init_splinen(ak,*o);
   } else {
@@ -74,25 +74,25 @@ void fproj(vector<float>& in, vector<float>& out, int nx, int ny, int *sx, int *
 
 
 
-  if (y4) { 
+  if (y4) {
     xx=((*x4-X1)*(Y3-Y1)-(*y4-Y1)*(X3-X1))/((X2-X1)*(Y3-Y1)-(Y2-Y1)*(X3-X1));
     yy=((*x4-X1)*(Y2-Y1)-(*y4-Y1)*(X2-X1))/((X3-X1)*(Y2-Y1)-(Y3-Y1)*(X2-X1));
     a = (yy-1.0)/(1.0-xx-yy);
     b = (xx-1.0)/(1.0-xx-yy);
-  } 
-  else 
+  }
+  else
     {
       a=b=0.0;
     }
 
-     
+
 
 
   /********** MAIN LOOP **********/
 
-  for (x=0;x<*sx;x++) 
+  for (x=0;x<*sx;x++)
     for (y=0;y<*sy;y++) {
-      
+
       /* COMPUTE LOCATION IN INPUT IMAGE */
       if (i) {
 	xx = 0.5+(((float)x-X1)*y13-((float)y-Y1)*x13)/(x12*y13-y12*x13);
@@ -112,36 +112,36 @@ void fproj(vector<float>& in, vector<float>& out, int nx, int ny, int *sx, int *
 
 
       /* INTERPOLATION */
-      
-      if (*o==0) { 
-	
+
+      if (*o==0) {
+
 	/* zero order interpolation (pixel replication) */
-	xi = (int)floor((double)xp); 
+	xi = (int)floor((double)xp);
 	yi = (int)floor((double)yp);
 /*	if (xi<0 || xi>=in->ncol || yi<0 || yi>=in->nrow)*/
 	if (xi<0 || xi>=nx || yi<0 || yi>=ny)
-	  res = *bg; 
-	else 
+	  res = *bg;
+	else
 		/* res = in->gray[yi*in->ncol+xi]; */
 		res = in[yi*nx+xi];
-      } else { 
-	
+      } else {
+
 	/* higher order interpolations */
-	if (xp<0. || xp>(float)nx || yp<0. || yp>(float)ny) res=*bg; 
+	if (xp<0. || xp>(float)nx || yp<0. || yp>(float)ny) res=*bg;
 	else {
 	  xp -= 0.5; yp -= 0.5;
-	  xi = (int)floor((double)xp); 
+	  xi = (int)floor((double)xp);
 	  yi = (int)floor((double)yp);
 	  ux = xp-(float)xi;
 	  uy = yp-(float)yi;
-	  switch (*o) 
+	  switch (*o)
 	    {
 	    case 1: /* first order interpolation (bilinear) */
 	      n2 = 1;
 	      cx[0]=ux;	cx[1]=1.-ux;
 	      cy[0]=uy; cy[1]=1.-uy;
 	      break;
-	      
+
 	    case -3: /* third order interpolation (bicubic Keys' function) */
 	      n2 = 2;
 	      keys(cx,ux,*p);
@@ -160,27 +160,27 @@ void fproj(vector<float>& in, vector<float>& out, int nx, int ny, int *sx, int *
 	      splinen(cy,uy,ak,*o);
 	      break;
 	    }
-	  
+
 	  res = 0.; n1 = 1-n2;
 	  /* this test saves computation time */
 	  if (xi+n1>=0 && xi+n2<nx && yi+n1>=0 && yi+n2<ny) {
-	    adr = yi*nx+xi; 
-	    for (dy=n1;dy<=n2;dy++) 
-	      for (dx=n1;dx<=n2;dx++) 
+	    adr = yi*nx+xi;
+	    for (dy=n1;dy<=n2;dy++)
+	      for (dx=n1;dx<=n2;dx++)
 /*		res += cy[n2-dy]*cx[n2-dx]*ref->gray[adr+nx*dy+dx];*/
 			  res += cy[n2-dy]*cx[n2-dx]*ref[adr+nx*dy+dx];
-	  } else 
+	  } else
 	    for (dy=n1;dy<=n2;dy++)
-	      for (dx=n1;dx<=n2;dx++) 
+	      for (dx=n1;dx<=n2;dx++)
 /*		res += cy[n2-dy]*cx[n2-dx]*v(ref,xi+dx,yi+dy,*bg); */
-	  res += cy[n2-dy]*cx[n2-dx]*v(ref,xi+dx,yi+dy,*bg,nx,ny); 
+	  res += cy[n2-dy]*cx[n2-dx]*v(ref,xi+dx,yi+dy,*bg,nx,ny);
 	}
-      }		
+      }
       /* out->gray[y*(*sx)+x] = res; */
 		out[y*(*sx)+x] = res;
     }
-  //if (coeffs) 
+  //if (coeffs)
 	  /* mw_delete_fimage(coeffs); */
-	//  delete[] coeffs; 
+	//  delete[] coeffs;
 }
 

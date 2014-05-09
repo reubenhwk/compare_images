@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 
@@ -12,12 +12,12 @@
 
 float * directional_gauss_filter(float xsigma, float ysigma, float angle, int *kwidth, int *kheight);
 
-	
+
 void median(float *u,float *v, float radius, int niter, int width,int height);
 void remove_outliers(float *igray,float *ogray,int width, int height);
 
 /// Convolution with a  separable kernel,  boundary condition: 0=zero, 1=symmetry
-void separable_convolution(float *u, float *v, int width, int height, float *xkernel, int xsize, float *ykernel, int ysize,int boundary);     
+void separable_convolution(float *u, float *v, int width, int height, float *xkernel, int xsize, float *ykernel, int ysize,int boundary);
 
 void buffer_convolution(float *buffer,float *kernel,int size,int ksize);
 void horizontal_convolution(float *u, float *v, int width, int height, float *kernel, int ksize, int boundary);

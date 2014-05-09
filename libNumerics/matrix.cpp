@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 #ifdef MATRIX_H // Do nothing if not included from matrix.h
@@ -307,7 +307,7 @@ matrix<T> matrix<T>::eye(int n)
 /// \param j0 first column
 /// \param j1 last column
 template <typename T>
-matrix<T> matrix<T>::copy(int i0, int i1, int j0, int j1) const 
+matrix<T> matrix<T>::copy(int i0, int i1, int j0, int j1) const
 {
     assert(0 <= i0 && i0 <= i1 && i1 <= m_rows &&
            0 <= j0 && j0 <= j1 && j1 <= m_cols);
@@ -325,7 +325,7 @@ matrix<T> matrix<T>::copy(int i0, int i1, int j0, int j1) const
 /// \param j0 first column
 /// \param j1 last column
 template <typename T>
-matrix<T> matrix<T>::copyCols(int j0, int j1) const 
+matrix<T> matrix<T>::copyCols(int j0, int j1) const
 {
     return copy(0, lastRow(), j0, j1);
 }
@@ -334,7 +334,7 @@ matrix<T> matrix<T>::copyCols(int j0, int j1) const
 /// \param i0 first row
 /// \param i1 last row
 template <typename T>
-matrix<T> matrix<T>::copyRows(int i0, int i1) const 
+matrix<T> matrix<T>::copyRows(int i0, int i1) const
 {
     return copy(i0, i1, 0, lastCol());
 }
@@ -432,7 +432,7 @@ void matrix<T>::swapCols(int j0, int j1)
 /// \param m number of rows
 /// \param n number of columns
 /// \param v an array of scalar of size m*n
-template <typename T> template <typename U> 
+template <typename T> template <typename U>
 void matrix<T>::read(const U* v)
 {
     for(int i = nElements()-1; i >= 0; i--)
@@ -440,7 +440,7 @@ void matrix<T>::read(const U* v)
 }
 
 /// Read the coefficients from \a m.
-template <typename T> 
+template <typename T>
 inline void matrix<T>::read(const matrix<T>& m)
 {
     assert(m.nElements() == nElements());
@@ -449,7 +449,7 @@ inline void matrix<T>::read(const matrix<T>& m)
 
 /// Copy the matrix coefficients in an array.
 ///
-/// The matrix is scanned row by row. 
+/// The matrix is scanned row by row.
 template <typename T>
 void matrix<T>::write(T* vect) const
 {
@@ -460,7 +460,7 @@ void matrix<T>::write(T* vect) const
 template <typename T>
 void matrix<T>::alloc(int m, int n)
 {
-    assert(m > 0 && n > 0);  
+    assert(m > 0 && n > 0);
     m_rows = m;
     m_cols = n;
     p = new T[m*n];

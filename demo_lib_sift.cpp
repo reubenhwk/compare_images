@@ -1,12 +1,12 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
-// WARNING: 
+// WARNING:
 // This file implements an algorithm possibly linked to the patent
 //
-// David Lowe  "Method and apparatus for identifying scale invariant 
-// features in an image and use of same for locating an object in an 
+// David Lowe  "Method and apparatus for identifying scale invariant
+// features in an image and use of same for locating an object in an
 // image",  U.S. Patent 6,711,293.
 //
 // This file is made available for the exclusive aim of serving as
@@ -43,11 +43,11 @@ void default_sift_parameters(siftPar &par)
 	par.DoubleImSize = 0;
 	par.order = 3;
 	par.InitSigma = 1.6;
-	par.BorderDist = 5; 
+	par.BorderDist = 5;
 	par.Scales = 3;
 	par.PeakThresh = 255.0 * 0.04 / 3.0;
-	par.EdgeThresh = 0.06; 
-	par.EdgeThresh1 = 0.08; 
+	par.EdgeThresh = 0.06;
+	par.EdgeThresh1 = 0.08;
 	par.OriBins  = 36;
 	par.OriSigma = 1.5;
 	par.OriHistThresh = 0.8;
@@ -56,8 +56,8 @@ void default_sift_parameters(siftPar &par)
 	par.IndexSigma  = 1.0;
 	par.IgnoreGradSign = 0;
 //	par.MatchRatio = 0.6;
-//	par.MatchRatio = 0.75; // Guoshen Yu. Since l1 distance is used for matching instead of l2, a larger threshold is needed. 
-	par.MatchRatio = 0.73; // Guoshen Yu. Since l1 distance is used for matching instead of l2, a larger threshold is needed. 
+//	par.MatchRatio = 0.75; // Guoshen Yu. Since l1 distance is used for matching instead of l2, a larger threshold is needed.
+	par.MatchRatio = 0.73; // Guoshen Yu. Since l1 distance is used for matching instead of l2, a larger threshold is needed.
 	par.MatchXradius = 1000000.0f;
 	par.MatchYradius = 1000000.0f;
 
@@ -68,7 +68,7 @@ void default_sift_parameters(siftPar &par)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// SIFT Keypoint detection 
+/// SIFT Keypoint detection
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -100,7 +100,7 @@ void AssignOriHist(
 
 void SmoothHistogram(
 	float* hist, int bins);
-	
+
 float InterpPeak(
 	float a, float b, float c);
 
@@ -111,14 +111,14 @@ void MakeKeypoint(
 void MakeKeypointSample(
 	keypoint& key, const flimage& grad, const flimage& ori,
 	float scale, float row, float col,siftPar &par);
-	
+
 void NormalizeVec(
 	float* vec);
-	
+
 void KeySampleVec(
 	keypoint& key, const flimage& grad, const flimage& ori,
 	float scale, float row, float col,siftPar &par);
-	
+
 void KeySample(
 	float index[IndexSize][IndexSize][OriSize], keypoint& key,
 	const flimage& grad, const flimage& ori,
@@ -149,12 +149,12 @@ void compute_sift_keypoints(float *input, keypointslist& keypoints, int width, i
 //		image.create(2*width, 2*height);
 //		apply_zoom(input,image.getPlane(),2.0,par.order,width,height);
 //		octSize *= 0.5;
-		
+
 		printf("Doulbe image size not allowed. Guoshen Yu\n");
 		exit(-1);
-		
 
-		
+
+
 	} else
 	{
 
@@ -166,8 +166,8 @@ void compute_sift_keypoints(float *input, keypointslist& keypoints, int width, i
 //    	 printf("Interpolation order: %d\n", par.order);
 
 
-	/// Apply initial smoothing to input image to raise its smoothing to par.InitSigma.  
-	/// We assume image from camera has smoothing of sigma = 0.5, which becomes sigma = 1.0 if image has been doubled. 
+	/// Apply initial smoothing to input image to raise its smoothing to par.InitSigma.
+	/// We assume image from camera has smoothing of sigma = 0.5, which becomes sigma = 1.0 if image has been doubled.
 	/// increase = sqrt(Init^2 - Current^2)
 	float	curSigma;
 	if (par.DoubleImSize) curSigma = 1.0; else curSigma = 0.5;
@@ -185,8 +185,8 @@ void compute_sift_keypoints(float *input, keypointslist& keypoints, int width, i
 
 
 
-	/// Convolve by par.InitSigma at each step inside OctaveKeypoints by steps of 
-	/// Subsample of factor 2 while reasonable image size 
+	/// Convolve by par.InitSigma at each step inside OctaveKeypoints by steps of
+	/// Subsample of factor 2 while reasonable image size
 
 	/// Keep reducing image by factors of 2 until one dimension is
 	/// smaller than minimum size at which a feature could be detected.
@@ -198,10 +198,10 @@ void compute_sift_keypoints(float *input, keypointslist& keypoints, int width, i
 
 		if (DEBUG) printf("Calling OctaveKeypoints \n");
 
-		OctaveKeypoints(image, octSize, keypoints,par); 
+		OctaveKeypoints(image, octSize, keypoints,par);
 
 		// image is blurred inside OctaveKeypoints and therefore can be sampled
-		flimage aux( (int)((float) image.nwidth() / 2.0f) , (int)((float) image.nheight() / 2.0f)); 
+		flimage aux( (int)((float) image.nwidth() / 2.0f) , (int)((float) image.nheight() / 2.0f));
 
 		if (DEBUG) printf("Sampling initial image \n");
 
@@ -218,7 +218,7 @@ void compute_sift_keypoints(float *input, keypointslist& keypoints, int width, i
 
 /*	printf("sift::  %d keypoints\n", keypoints.size());
 	printf("sift::  plus non correctly localized: %d \n", 	par.noncorrectlylocalized);*/
-	
+
 }
 
 
@@ -238,7 +238,7 @@ void OctaveKeypoints(flimage & image, float octSize, keypointslist& keys,siftPar
 	// Guoshen Yu, 2010.09.21, Windows version
    // flimage blur[par.Scales+3], dogs[par.Scales+2];
 	int size_blur = par.Scales+3;
-	int size_dogs = par.Scales+2;	  
+	int size_dogs = par.Scales+2;
     flimage *blur = new flimage[size_blur];
 	flimage *dogs = new flimage[size_dogs];
 
@@ -246,13 +246,13 @@ void OctaveKeypoints(flimage & image, float octSize, keypointslist& keys,siftPar
 
 
 	/* Build array, blur, holding par.Scales+3 blurred versions of the image. */
-	blur[0] = flimage(image);	/* First level is input to this routine. */ 
+	blur[0] = flimage(image);	/* First level is input to this routine. */
 	float prevSigma = par.InitSigma;	/* Input image has par.InitSigma smoothing. */
 
 
 	/* Form each level by adding incremental blur from previous level.
 	Increase in blur is from prevSigma to prevSigma * sigmaRatio, so
-	increase^2 = (prevSigma * sigmaRatio)^2 - prevSigma^2 
+	increase^2 = (prevSigma * sigmaRatio)^2 - prevSigma^2
  	*/
 	for (int i = 1; i < par.Scales + 3; i++) {
 
@@ -267,7 +267,7 @@ void OctaveKeypoints(flimage & image, float octSize, keypointslist& keys,siftPar
 		prevSigma *= sigmaRatio;
 
 	}
-	
+
 
 	/* Compute an array, dogs, of difference-of-Gaussian images by
 	subtracting each image from its next blurred version. */
@@ -276,7 +276,7 @@ void OctaveKeypoints(flimage & image, float octSize, keypointslist& keys,siftPar
 		dogs[i] = flimage(blur[i]);
 
 		/// dogs[i] = dogs[i] - blur[i+1]
-		combine(dogs[i].getPlane(),1.0f, blur[i+1].getPlane(),-1.0f, dogs[i].getPlane(),  dogs[i].nwidth() * dogs[i].nheight()); 
+		combine(dogs[i].getPlane(),1.0f, blur[i+1].getPlane(),-1.0f, dogs[i].getPlane(),  dogs[i].nwidth() * dogs[i].nheight());
 	}
 
 
@@ -287,12 +287,12 @@ void OctaveKeypoints(flimage & image, float octSize, keypointslist& keys,siftPar
 	if (DEBUG) printf("Looking for local maxima \n");
 
 	FindMaxMin(dogs, blur, octSize, keys,par);
-	
+
 	// Guoshen Yu, 2010.09.22, Windows version
     delete [] blur;
 	delete [] dogs;
 }
-	
+
 
 /////////////////////////////////////////////////
 ///Find the local maxima and minima of the DOG images in scale space.  Return the keypoints for these locations.
@@ -321,7 +321,7 @@ void FindMaxMin(
 	flimage map(width,height,0.0f);
 	flimage grad(width,height,0.0f);
 	flimage ori(width,height,0.0f);
-	
+
 	/* Search through each scale, leaving 1 scale below and 1 above.
 		There are par.Scales+2 dog images.
 	*/
@@ -335,18 +335,18 @@ void FindMaxMin(
 		images to be used for keypoint description.  */
 		compute_gradient_orientation(blur[s].getPlane(), grad.getPlane(), ori.getPlane(), blur[s].nwidth(), blur[s].nheight());
 
-	
+
 		/* Only find peaks at least par.BorderDist samples from image border, as
 		peaks centered close to the border will lack stability. */
 		assert(par.BorderDist >= 2);
 		float val;
 		int partialcounter = 0;
-		for (int r = par.BorderDist; r < height - par.BorderDist; r++) 
+		for (int r = par.BorderDist; r < height - par.BorderDist; r++)
 			for (int c = par.BorderDist; c < width - par.BorderDist; c++) {
-			
+
 				/* Pixel value at (c,r) position. */
-				val = dogs[s](c,r);	
-	
+				val = dogs[s](c,r);
+
 				/* DOG magnitude must be above 0.8 * par.PeakThresh threshold
 				(precise threshold check will be done once peak
 				interpolation is performed).  Then check whether this
@@ -365,27 +365,27 @@ void FindMaxMin(
 						if (DEBUG) printf("Maximum Keypoint found (%d,%d,%d)  val: %f\n",s,r,c,val);
 						InterpKeyPoint(
 							dogs, s, r, c, grad, ori,
-							map, octSize, keys, 5,par);	
+							map, octSize, keys, 5,par);
 
 					} else  if (LocalMin(val, dogs[s-1], r, c,par) && LocalMin(val, dogs[s], r, c,par) && LocalMin(val, dogs[s+1], r, c,par) && NotOnEdge(dogs[s], r, c, octSize,par))
 					{
 						if (DEBUG) printf("Minimum Keypoint found (%d,%d,%d)  val: %f\n",s,r,c,val);
 						InterpKeyPoint(
 							dogs, s, r, c, grad, ori,
-							map, octSize, keys, 5,par);	
+							map, octSize, keys, 5,par);
 					}
 */
 					if (LocalMaxMin(val, dogs[s-1], r, c) && LocalMaxMin(val, dogs[s], r, c) && LocalMaxMin(val, dogs[s+1], r, c) && NotOnEdge(dogs[s], r, c, octSize,par))
 					{
 						partialcounter++;
 						if (DEBUG) printf("%d:  (%d,%d,%d)  val: %f\n",partialcounter, s,r,c,val);
-						
+
 						InterpKeyPoint(
 							dogs, s, r, c, grad, ori,
-							map, octSize, keys, 5,par);	
+							map, octSize, keys, 5,par);
 
 						//getchar();
-					} 
+					}
 
 
 				}
@@ -450,8 +450,8 @@ bool LocalMaxMin(float val, const flimage& dog, int y0, int x0)
    many points.  It requires that the ratio of the two principle
    curvatures of the DOG function at this point be below a threshold.
 
-   Edge threshold is higher on the first scale where SNR is small in 
-   order to reduce the number of unstable keypoints. 
+   Edge threshold is higher on the first scale where SNR is small in
+   order to reduce the number of unstable keypoints.
 */
 int NotOnEdge(flimage& dog, int r, int c, float octSize,siftPar &par)
 {
@@ -462,15 +462,15 @@ int NotOnEdge(flimage& dog, int r, int c, float octSize,siftPar &par)
 
 	/* Compute determinant and trace of the Hessian. */
 	float	det = H00 * H11 - H01 * H01,	/// Det H = \prod l_i
-		trace = H00 + H11;		/// tr H = \sum l_i	
+		trace = H00 + H11;		/// tr H = \sum l_i
 
 	/// As we do not desire edges but only corners we demand l_max / l_min less than a threshold
 	/// In practice if A = k B,     A*B = k B^2
 	///				(A + B)^2 = (k+1)^2 * B^2
 	///				k B^2 >  t * (k+1)^2 * B^2 sii   k  / (k+1)^2 > t
 	/// This is a decreasing function for k > 1 and value 0.3 at k=1.
-	/// Setting t = 0.08, means k<=10 
-	 
+	/// Setting t = 0.08, means k<=10
+
 	/* To detect an edge response, we require the ratio of smallest
 	   to largest principle curvatures of the DOG function
 	   (eigenvalues of the Hessian) to be below a threshold.  For
@@ -497,7 +497,7 @@ void InterpKeyPoint(
 	const flimage& grad, const flimage& ori, flimage& map,
 	float octSize, keypointslist& keys, int movesRemain,siftPar &par)
 {
-	
+
 	/* Fit quadratic to determine offset and peak value. */
 	float offset[3];
 	float peakval = FitQuadratic(offset, dogs, s, r, c);
@@ -533,13 +533,13 @@ void InterpKeyPoint(
 	   outside expected limits, or if magnitude of peak value is below
 	   threshold (i.e., contrast is too low). */
 	if (	fabs(offset[0]) > 1.5 || fabs(offset[1]) > 1.5 ||
-		fabs(offset[2]) > 1.5 || fabs(peakval) < par.PeakThresh)		
+		fabs(offset[2]) > 1.5 || fabs(peakval) < par.PeakThresh)
 		{
-			if (DEBUG) printf("Point not well localized by FitQuadratic\n"); 	
+			if (DEBUG) printf("Point not well localized by FitQuadratic\n");
 			par.noncorrectlylocalized++;
 			return;
 		}
-	
+
 	/* Check that no keypoint has been created at this location (to avoid
 	   duplicates).  Otherwise, mark this map location.
 	*/
@@ -613,13 +613,13 @@ float FitQuadratic(float offset[3], flimage* dogs, int s, int r, int c)
 	offset[2] = - g[2];
 
 // 	for(i=0; i < 3; i++){
-// 	
+//
 // 		for(j=0; j < 3; j++) printf("%f  ", H[i][j]);
 // 		printf("\n");
 // 	}
 
 // 	printf("\n");
-// 
+//
 // 	for(i=0; i < 3; i++) printf("%f  ", offset[i]);
 // 	printf("\n");
 
@@ -666,7 +666,7 @@ void AssignOriHist(
 	int tmp_size = par.OriBins;
     float *hist = new float[tmp_size];
 
-	float radius2, sigma2;		
+	float radius2, sigma2;
 
 	int	row = (int) (octRow+0.5),
 		col = (int) (octCol+0.5),
@@ -688,16 +688,16 @@ void AssignOriHist(
 
 	for (int r = rmin; r <= rmax; r++) {
 		for (int c = cmin; c <= cmax; c++) {
-			
+
 				gval = grad(c,r);
-				
+
 				dif = (r - octRow);	distsq = dif*dif;
 				dif = (c - octCol);	distsq += dif*dif;
 
 				if (gval > 0.0  &&  distsq < radius2 + 0.5) {
 
 					weight = exp(- distsq / sigma2);
-					
+
 					/* Ori is in range of -PI to PI. */
 					angle = ori(c,r);
 					bin = (int) (par.OriBins * (angle + PI + 0.001) / (2.0 * PI));
@@ -706,7 +706,7 @@ void AssignOriHist(
 					hist[bin] += weight * gval;
 
 				}
-			
+
 		}
 	}
 
@@ -717,7 +717,7 @@ void AssignOriHist(
 
 	/* Find maximum value in histogram. */
 	float maxval = 0.0;
-	for (int i = 0; i < par.OriBins; i++) 
+	for (int i = 0; i < par.OriBins; i++)
 		if (hist[i] > maxval) maxval = hist[i];
 
 	/* Look for each local peak in histogram.  If value is within
@@ -728,13 +728,13 @@ void AssignOriHist(
 
 		if (	hist[i] > hist[prev]  &&  hist[i] > hist[next]  &&
 			hist[i] >= par.OriHistThresh * maxval ) {
-	
+
 			/* Use parabolic fit to interpolate peak location from 3 samples.
 			  Set angle in range -PI to PI. */
 			interp = InterpPeak(hist[prev], hist[i], hist[next]);
 			angle = 2.0 * PI * (i + 0.5 + interp) / par.OriBins - PI;
 			assert(angle >= -PI  &&  angle <= PI);
-		
+
 			if (DEBUG) printf("angle selected: %f \t location: (%f,%f)\n", angle, octRow, octCol);
 ;
 			/* Create a keypoint with this orientation. */
@@ -855,7 +855,7 @@ void MakeKeypointSample(
 void NormalizeVec(float* vec)
 {
 	float val, fac;
-	
+
 	float sqlen = 0.0;
 	for (int i = 0; i < VecLength; i++) {
 		val = vec[i];
@@ -875,7 +875,7 @@ void KeySampleVec(
 	keypoint& key, const flimage& grad, const flimage& ori,
 	float scale, float row, float col,siftPar &par)
 {
-	
+
 	float index[IndexSize][IndexSize][OriSize];
 
 	/* Initialize index array. */
@@ -947,7 +947,7 @@ void KeySample(
 			 weight on index[1] (e.g., when rpos is 0 and IndexSize is 3. */
 			 rx = rpos + IndexSize / 2.0 - 0.5;
 			 cx = cpos + IndexSize / 2.0 - 0.5;
-	
+
 			/* Test whether this sample falls within boundary of index patch. */
 			if (	rx > -1.0 && rx < (float) IndexSize  &&
 				cx > -1.0 && cx < (float) IndexSize )
@@ -974,12 +974,12 @@ void AddSample(
 	   from center.  Sigma is relative to half-width of index. */
 	float	sigma  = par.IndexSigma * 0.5 * IndexSize,
 		weight = exp(- (rpos * rpos + cpos * cpos) / (2.0 * sigma * sigma)),
-//		mag    = weight *  grad(c,r); 
+//		mag    = weight *  grad(c,r);
 		mag    = weight *  grad((int)c,(int)r); // Guoshen Yu, explicitely cast to int to avoid warning
 
 
 	/* Subtract keypoint orientation to give ori relative to keypoint. */
-//	float	ori = orim(c,r) -  key.angle; 
+//	float	ori = orim(c,r) -  key.angle;
 	float	ori = orim((int)c,(int)r) -  key.angle; // Guoshen Yu, explicitely cast to int to avoid warning
 
 
@@ -1012,11 +1012,11 @@ void PlaceInIndex(
 //	int	ri = (rx >= 0.0) ? rx : rx - 1.0,	/* Round down to next integer. */
 //		ci = (cx >= 0.0) ? cx : cx - 1.0,
 //		oi = (oval >= 0.0) ? oval : oval - 1.0;
-	
+
 	int	ri = (int)((rx >= 0.0) ? rx : rx - 1.0),	/* Round down to next integer. */ // Guoshen Yu, explicitely cast to int to avoid warning
 		ci = (int)((cx >= 0.0) ? cx : cx - 1.0), // Guoshen Yu, explicitely cast to int to avoid warning
 		oi = (int)((oval >= 0.0) ? oval : oval - 1.0); // Guoshen Yu, explicitely cast to int to avoid warning
-	
+
 	float	rfrac = rx - ri,			/* Fractional part of location. */
 		cfrac = cx - ci,
 		ofrac = oval - oi;
@@ -1058,13 +1058,13 @@ void PlaceInIndex(
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// SIFT keypoint matching 
+/// SIFT keypoint matching
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 float DistSquared(keypoint &k1,keypoint &k2, float tdist, siftPar &par)
 {
-	
+
 	float dif;
 	float distsq = 0.0;
 
@@ -1081,9 +1081,9 @@ float DistSquared(keypoint &k1,keypoint &k2, float tdist, siftPar &par)
 		dif = ik1[i] - ik2[i];
 		distsq += dif * dif;
 		//distsq += ABS(dif);
-		
+
 //		distsq += ((ik1[i] > ik2[i]) ? (ik1[i] - ik2[i]) : (-ik1[i] + ik2[i]));
-		
+
 	}
 
 	return distsq;
@@ -1093,20 +1093,20 @@ float DistSquared_short(keypoint_short &k1,keypoint_short &k2, float tdist, sift
 {
 	// For Mac/Linux compilation using make: vectorization is possible with short.
 	unsigned short distsq = 0;
-	
-	// For Windows compilation using Intel C++ compiler: vectorization is possible with int. 
+
+	// For Windows compilation using Intel C++ compiler: vectorization is possible with int.
 	// int distsq = 0;
-	
+
 	if (ABS(k1.x - k2.x) > par.MatchXradius || ABS(k1.y - k2.y) > par.MatchYradius) return tdist;
-	
-	
+
+
 	unsigned short *ik1 = k1.vec;
 	unsigned short *ik2 = k2.vec;
 
 	for (int i = 0; i < VecLength ; i++) {
-		distsq += ((ik1[i] > ik2[i]) ? (ik1[i] - ik2[i]) : (-ik1[i] + ik2[i]));	
+		distsq += ((ik1[i] > ik2[i]) ? (ik1[i] - ik2[i]) : (-ik1[i] + ik2[i]));
 	}
-	
+
 	return distsq;
 }
 
@@ -1119,15 +1119,15 @@ float DistSquared_short(keypoint_short &k1,keypoint_short &k2, float tdist, sift
 */
 float CheckForMatch(
 	 keypoint& key, keypointslist& klist, int& min,siftPar &par)
-{	
+{
 	int	nexttomin = -1;
 	float	dsq, distsq1, distsq2;
 	distsq1 = distsq2 = 1000000000000.0f;
 
 	for (int j=0; j< (int) klist.size(); j++){
-	
+
 		dsq = DistSquared(key, klist[j], distsq2,par);
-		
+
 		if (dsq < distsq1) {
 			distsq2 = distsq1;
 			distsq1 = dsq;
@@ -1144,15 +1144,15 @@ float CheckForMatch(
 
 float CheckForMatch_short(
 					keypoint_short& key, keypointslist_short& klist, int& min,siftPar &par)
-{	
+{
 	int	nexttomin = -1;
 	float	dsq, distsq1, distsq2;
 	distsq1 = distsq2 = 1000000000000.0f;
-	
+
 	for (int j=0; j< (int) klist.size(); j++){
-		
+
 		dsq = DistSquared_short(key, klist[j], distsq2,par);
-		
+
 		if (dsq < distsq1) {
 			distsq2 = distsq1;
 			distsq1 = dsq;
@@ -1163,7 +1163,7 @@ float CheckForMatch_short(
 			nexttomin = j;
 		}
 	}
-	
+
 	return distsq1/distsq2 ;
 }
 
@@ -1176,7 +1176,7 @@ void compute_sift_matches(
 	int	imatch=0;
 	float	sqminratio = par.MatchRatio * par.MatchRatio,
 		sqratio;
-		
+
 	// write the keypoint descriptors in char
 	keypointslist_short keys1_short(keys1.size());
 	for (int i=0; i< (int) keys1.size(); i++)
@@ -1185,14 +1185,14 @@ void compute_sift_matches(
 		keys1_short[i].y = keys1[i].y;
 		keys1_short[i].scale = keys1[i].scale;
 		keys1_short[i].angle = keys1[i].angle;
-		
+
 		for (int k=0; k < VecLength; k++)
 		{
 			keys1_short[i].vec[k] = (unsigned short) (keys1[i].vec[k]);
 		}
 
 	}
-	
+
 	keypointslist_short keys2_short(keys2.size());
 	for (int i=0; i< (int) keys2.size(); i++)
 	{
@@ -1200,18 +1200,18 @@ void compute_sift_matches(
 		keys2_short[i].y = keys2[i].y;
 		keys2_short[i].scale = keys2[i].scale;
 		keys2_short[i].angle = keys2[i].angle;
-		
+
 		for (int k=0; k < VecLength; k++)
 		{
 			keys2_short[i].vec[k] = (unsigned short) (keys2[i].vec[k]);
 		}
-		
+
 	}
-	
+
 	for (int i=0; i< (int) keys1.size(); i++) {
 
 	//	sqratio = CheckForMatch(keys1[i], keys2, imatch,par);
-		
+
 		sqratio = CheckForMatch_short(keys1_short[i], keys2_short, imatch,par);
 
 

@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 
@@ -20,7 +20,7 @@ void desallocate_float_matrix(float **matrix, int nrows, int ncols)
 
 	for(int i=0; i < nrows; i++) { delete[] matrix[i]; matrix[i] = 0;}
 	matrix = 0;
-	
+
 	ncols = ncols; // to remove the warning unused parameter ¡®ncols¡¯
 }
 
@@ -31,7 +31,7 @@ void desallocate_float_matrix(float **matrix, int nrows, int ncols)
 
 
 
-// Solves Ax=b by using lu decomposition 
+// Solves Ax=b by using lu decomposition
 int lusolve(float **a, float *x, float *b, int n)
 {
 
@@ -43,7 +43,7 @@ int lusolve(float **a, float *x, float *b, int n)
 
 		for(int i=0; i < n; i++) x[i] = b[i];
 		lubksb(a,n,indx,x);
-		
+
 		delete[] indx; /*memcheck*/
 		return 1;
 	} else
@@ -52,7 +52,7 @@ int lusolve(float **a, float *x, float *b, int n)
 		printf("lusolve::lu decomposition failed\n");
 		delete[] indx; /*memcheck*/
 		return 0;
-	}	
+	}
 	delete[] indx; // Guoshen Yu
 }
 
@@ -77,33 +77,33 @@ int ludcmp(float **a, int n, int *indx, float *d)
 	for(i=0;i<n;i++){
 
 		big=0.0;
-		for(j=0;j<n;j++) 
+		for(j=0;j<n;j++)
 			if ( (temp=fabs(a[i][j]))>big ) big=temp;
 
 			if (big==0.0) { return 0; printf("LU Decomposition failed\n");}
-			
+
 		vv[i]=1.0/big;
 	}
 
 
-  
+
 
 	for(j=0;j<n;j++){
 
 		for(i=0;i<j;i++){
-      
+
 			sum=a[i][j];
 			for(k=0;k<i;k++) sum-= a[i][k]*a[k][j];
-			a[i][j]=sum; 
+			a[i][j]=sum;
 
 		}
 
 
 		big=0.0;
 		for(i=j;i<n;i++){
-      
+
 			sum=a[i][j];
-			for(k=0;k<j;k++)   
+			for(k=0;k<j;k++)
 				sum -=a[i][k]*a[k][j];
 			a[i][j]=sum;
 
@@ -113,7 +113,7 @@ int ludcmp(float **a, int n, int *indx, float *d)
 			}
 		}
 
-    
+
 		if (j != imax){
 
 			for(k=0;k<n;k++){
@@ -132,14 +132,14 @@ int ludcmp(float **a, int n, int *indx, float *d)
 		}
 
 		if (a[j][j]==0.0)  a[j][j]=NRTINY;
-    
+
 
 		if (j!=n-1 ){
 
 			dum=1.0 / a[j][j];
 			for(i=j+1;i<n;i++) a[i][j]*=dum;
 		}
-    
+
 
 	}
 
@@ -159,8 +159,8 @@ void lubksb(float **a, int n, int *indx, float *b)
 	float sum,*aux;
 
 	aux= (float *) malloc(n*sizeof(float));
-	
-	
+
+
 	for(i=0;i<n;i++)
 		aux[i]=b[indx[i]];
 

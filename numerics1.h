@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 
@@ -32,7 +32,7 @@ void desallocate_float_matrix(float **matrix, int nrows, int ncols);
 //  LU based algorithms
 // **********************************************
 
-// Solves Ax=b by using lu decomposition 
+// Solves Ax=b by using lu decomposition
 // a matrix a[1..n][1..n] is replaced by the LU decompositions of a rowwise permutation of itself
 // b[1..n] and x[1..n]
 int lusolve(float **a, float *x, float *b, int n);

@@ -1,11 +1,11 @@
 // Copyright (c) 2008-2011, Guoshen Yu <yu@cmap.polytechnique.fr>
 // Copyright (c) 2008-2011, Jean-Michel Morel <morel@cmla.ens-cachan.fr>
 //
-// WARNING: 
+// WARNING:
 // This file implements an algorithm possibly linked to the patent
 //
-// Jean-Michel Morel and Guoshen Yu, Method and device for the invariant 
-// affine recognition recognition of shapes (WO/2009/150361), patent pending. 
+// Jean-Michel Morel and Guoshen Yu, Method and device for the invariant
+// affine recognition recognition of shapes (WO/2009/150361), patent pending.
 //
 // This file is made available for the exclusive aim of serving as
 // scientific tool to verify of the soundness and
@@ -27,15 +27,15 @@
 // source or executable form. A license must be obtained from the
 // patent right holders for any other use.
 //
-// 
+//
 //*------------------------ compute_asift_keypoints -------------------------*/
-// Compute the ASIFT keypoints on the input image. 
-// 
+// Compute the ASIFT keypoints on the input image.
+//
 // Please report bugs and/or send comments to Guoshen Yu yu@cmap.polytechnique.fr
-// 
-// Reference: J.M. Morel and G.Yu, ASIFT: A New Framework for Fully Affine Invariant Image 
-//            Comparison, SIAM Journal on Imaging Sciences, vol. 2, issue 2, pp. 438-469, 2009. 
-// Reference: ASIFT online demo (You can try ASIFT with your own images online.) 
+//
+// Reference: J.M. Morel and G.Yu, ASIFT: A New Framework for Fully Affine Invariant Image
+//            Comparison, SIAM Journal on Imaging Sciences, vol. 2, issue 2, pp. 438-469, 2009.
+// Reference: ASIFT online demo (You can try ASIFT with your own images online.)
 //			  http://www.ipol.im/pub/algo/my_affine_sift/
 /*---------------------------------------------------------------------------*/
 
@@ -102,7 +102,7 @@ void ConvBufferFast(float *buffer, float *kernel, int rsize, int ksize)
     //      sum += (double) bp[0] * (double) kp[0] + (double)  bp[1] * (double) kp[1] + (double) bp[2] * (double) kp[2] +
     //             (double) bp[3] * (double) kp[3] + (double)  bp[4] * (double) kp[4];
     //      bp += 5;
-    //      kp += 5;		  
+    //      kp += 5;
     //     }
     //      /* Do 2 multiplications at a time on remaining items. */
     //     while (kp + 1 < endkp) {
@@ -116,7 +116,7 @@ void ConvBufferFast(float *buffer, float *kernel, int rsize, int ksize)
     //		}
 
     while (kp < endkp) {
-      sum += *bp++ * *kp++;			  
+      sum += *bp++ * *kp++;
     }
 
     buffer[i] = sum;
@@ -156,7 +156,7 @@ void ConvHorizontal(vector<float>& image, int width, int height, float *kernel, 
     for (c = 0; c < cols; c++)
       pixels[r*cols+c] = buffer[c];
   }
-  image = pixels;	 
+  image = pixels;
 }
 
 
@@ -188,7 +188,7 @@ void ConvVertical(vector<float>& image, int width, int height, float *kernel, in
       pixels[r*cols+c] = buffer[r];
   }
 
-  image = pixels;	 
+  image = pixels;
 }
 
 
@@ -234,7 +234,7 @@ void GaussianBlur1D(vector<float>& image, int width, int height, float sigma, in
 
 void compensate_affine_coor1(float *x0, float *y0, int w1, int h1, float t1, float t2, float Rtheta)
 {
-  float x_ori, y_ori;	
+  float x_ori, y_ori;
   float x_tmp, y_tmp;
 
   float x1 = *x0;
@@ -269,7 +269,7 @@ void compensate_affine_coor1(float *x0, float *y0, int w1, int h1, float t1, flo
   x_tmp = cos_Rtheta*x1 - sin_Rtheta*y1;
   y_tmp = sin_Rtheta*x1 + cos_Rtheta*y1;
   x1 = x_tmp;
-  y1 = y_tmp;		
+  y1 = y_tmp;
 
   *x0 = x1;
   *y0 = y1;
@@ -284,15 +284,15 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
 // image: input image
 // width, height: width and height of the input image.
 // num_of_tilts: number of tilts to simulate.
-// verb: 1/0 --> show/don not show verbose messages. (1 for debugging) 
-// keys_all (output): ASIFT keypoints. It is a 2D matrix with varying rows and columns. Each entry keys_all[tt][rr] 
+// verb: 1/0 --> show/don not show verbose messages. (1 for debugging)
+// keys_all (output): ASIFT keypoints. It is a 2D matrix with varying rows and columns. Each entry keys_all[tt][rr]
 //	stores the SIFT keypoints calculated on the image with the simulated tilt index tt and simulated rotation index rr (see the code below). In the coordinates of the keypoints,
-//	the affine distortions have been compensated. 
+//	the affine distortions have been compensated.
 // siftparameters: SIFT parameters.
 //
-// Output: the number of keypoints 
-{	
-  vector<float> image_t, image_tmp1, image_tmp;	
+// Output: the number of keypoints
+{
+  vector<float> image_t, image_tmp1, image_tmp;
 
   float t_min, t_k;
   int num_tilt, tt, num_rot_t2, rr;
@@ -331,14 +331,14 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
   if ( num_tilt < 1)
   {
     printf("Number of tilts num_tilt should be equal or larger than 1. \n");
-    exit(-1);	
+    exit(-1);
   }
 
   image_tmp1 = image;
 
 
   /* Calculate the number of simulations, and initialize keys_all */
-  keys_all = std::vector< vector< keypointslist > >(num_tilt);	
+  keys_all = std::vector< vector< keypointslist > >(num_tilt);
   for (tt = 1; tt <= num_tilt; tt++)
   {
     float t = t_min * pow(t_k, tt-1);
@@ -351,7 +351,7 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
     }
     else
     {
-      int num_rot1 = round(num_rot_t2*t/2);        
+      int num_rot1 = round(num_rot_t2*t/2);
       if ( num_rot1%2 == 1 )
       {
         num_rot1 = num_rot1 + 1;
@@ -359,8 +359,8 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
       num_rot1 = num_rot1 / 2;
       counter_sim +=  num_rot1;
 
-      keys_all[tt-1] = std::vector< keypointslist >(num_rot1);	
-    }         		
+      keys_all[tt-1] = std::vector< keypointslist >(num_rot1);
+    }
   }
 
   num_sim = counter_sim;
@@ -375,7 +375,7 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
 
 
   /* Affine simulation (rotation+tilt simulation) */
-  // Loop on tilts. 
+  // Loop on tilts.
 #ifdef _OPENMP
   omp_set_nested(1);
 #endif
@@ -387,10 +387,10 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
     float t1 = 1;
     float t2 = 1/t;
 
-    // If tilt t = 1, do not simulate rotation. 	
+    // If tilt t = 1, do not simulate rotation.
     if ( t == 1 )
-    {					
-      // copy the image from vector to array as compute_sift_keypoints uses only array.				
+    {
+      // copy the image from vector to array as compute_sift_keypoints uses only array.
       float *image_tmp1_float = new float[width*height];
       for (int cc = 0; cc < width*height; cc++)
         image_tmp1_float[cc] = image_tmp1[cc];
@@ -402,19 +402,19 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
     }
     else
     {
-      // The number of rotations to simulate under the current tilt.   
-      int num_rot1 = round(num_rot_t2*t/2);        
+      // The number of rotations to simulate under the current tilt.
+      int num_rot1 = round(num_rot_t2*t/2);
 
       if ( num_rot1%2 == 1 )
       {
         num_rot1 = num_rot1 + 1;
       }
       num_rot1 = num_rot1 / 2;
-      float delta_theta = PI/num_rot1;		
+      float delta_theta = PI/num_rot1;
 
-      // Loop on rotations.    
+      // Loop on rotations.
 #pragma omp parallel for private(rr)
-      for ( int rr = 1; rr <= num_rot1; rr++ ) 
+      for ( int rr = 1; rr <= num_rot1; rr++ )
       {
         float theta = delta_theta * (rr-1);
         theta = theta * 180 / PI;
@@ -425,18 +425,18 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
         // simulate a rotation: rotate the image with an angle theta. (the outside of the rotated image are padded with the value frot_b)
         frot(image, image_t, width, height, &width_r, &height_r, &theta, &frot_b , frot_k);
 
-        /* Tilt */			 
+        /* Tilt */
         int width_t = (int) (width_r * t1);
-        int height_t = (int) (height_r * t2);  
+        int height_t = (int) (height_r * t2);
 
         int fproj_sx = width_t;
-        int fproj_sy = height_t;     
+        int fproj_sy = height_t;
 
         float fproj_x1 = 0;
         float fproj_y1 = 0;
         float fproj_x2 = width_t;
         float fproj_y2 = 0;
-        float fproj_x3 = 0;	     
+        float fproj_x3 = 0;
         float fproj_y3 = height_t;
 
         /* Anti-aliasing filtering along vertical direction */
@@ -446,10 +446,10 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
 
 
         // simulate a tilt: subsample the image along the vertical axis by a factor of t.
-        vector<float> image_tmp(width_t*height_t);			 
-        fproj (image_t, image_tmp, width_r, height_r, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o, &fproj_p, &fproj_i , fproj_x1 , fproj_y1 , fproj_x2 , fproj_y2 , fproj_x3 , fproj_y3, fproj_x4, fproj_y4); 
+        vector<float> image_tmp(width_t*height_t);
+        fproj (image_t, image_tmp, width_r, height_r, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o, &fproj_p, &fproj_i , fproj_x1 , fproj_y1 , fproj_x2 , fproj_y2 , fproj_x3 , fproj_y3, fproj_x4, fproj_y4);
 
-        vector<float> image_tmp1 = image_tmp;	 
+        vector<float> image_tmp1 = image_tmp;
 
         if ( verb )
         {
@@ -459,20 +459,20 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
 
         float *image_tmp1_float = new float[width_t*height_t];
         for (int cc = 0; cc < width_t*height_t; cc++)
-          image_tmp1_float[cc] = image_tmp1[cc];	 
+          image_tmp1_float[cc] = image_tmp1[cc];
 
-        // compute SIFT keypoints on simulated image. 	 
+        // compute SIFT keypoints on simulated image.
         keypointslist keypoints;
         keypointslist keypoints_filtered;
         compute_sift_keypoints(image_tmp1_float,keypoints,width_t,height_t,siftparameters);
 
-        delete[] image_tmp1_float;		
+        delete[] image_tmp1_float;
 
         /* check if the keypoint is located on the boundary of the parallelogram (i.e., the boundary of the distorted input image). If so, remove it to avoid boundary artifacts. */
         if ( keypoints.size() != 0 )
         {
           for ( int cc = 0; cc < (int) keypoints.size(); cc++ )
-          {		      
+          {
 
             float x0, y0, x1, y1, x2, y2, x3, y3 ,x4, y4, d1, d2, d3, d4, scale1, theta1, sin_theta1, cos_theta1, BorderTh;
 
@@ -488,7 +488,7 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
             if ( theta <= 90 )
             {
               x1 = height * sin_theta1;
-              y1 = 0;			 
+              y1 = 0;
               y2 = width * sin_theta1;
               x3 = width * cos_theta1;
               x4 = 0;
@@ -496,7 +496,7 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
               x2 = x1 + x3;
               y3 = y2 + y4;
 
-              /* note that the vertical direction goes from top to bottom!!! 
+              /* note that the vertical direction goes from top to bottom!!!
               The calculation above assumes that the vertical direction goes from the bottom to top. Thus the vertical coordinates need to be reversed!!! */
               y1 = y3 - y1;
               y2 = y3 - y2;
@@ -513,13 +513,13 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
               y1 = -height * cos_theta1;
               x2 = height * sin_theta1;
               x3 = 0;
-              y3 = width * sin_theta1;				 
+              y3 = width * sin_theta1;
               x4 = -width * cos_theta1;
               y4 = 0;
               x1 = x2 + x4;
               y2 = y1 + y3;
 
-              /* note that the vertical direction goes from top to bottom!!! 
+              /* note that the vertical direction goes from top to bottom!!!
               The calculation above assumes that the vertical direction goes from the bottom to top. Thus the vertical coordinates need to be reversed!!! */
               y1 = y2 - y1;
               y3 = y2 - y3;
@@ -530,7 +530,7 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
               y2 = y2 * t2;
               y3 = y3 * t2;
               y4 = y4 * t2;
-            }		       		    
+            }
 
             /* the distances from the keypoint to the 4 sides of the parallelogram */
             d1 = ABS((x2-x1)*(y1-y0)-(x1-x0)*(y2-y1)) / sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
@@ -541,27 +541,27 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
             BorderTh = BorderFact*scale1;
 
             if (!((d1<BorderTh) || (d2<BorderTh) || (d3<BorderTh) || (d4<BorderTh) ))
-            {				 					   
+            {
               // Normalize the coordinates of the matched points by compensate the simulate affine transformations
               compensate_affine_coor1(&x0, &y0, width, height, 1/t2, t1, theta);
               keypoints[cc].x = x0;
               keypoints[cc].y = y0;
 
-              keypoints_filtered.push_back(keypoints[cc]);	 
-            }				   
+              keypoints_filtered.push_back(keypoints[cc]);
+            }
           }
-        }			 
+        }
         keys_all[tt-1][rr-1] = keypoints_filtered;
-      }		 
-    }         
+      }
+    }
   }
 
-  {		
+  {
     for (tt = 0; tt < (int) keys_all.size(); tt++)
       for (rr = 0; rr < (int) keys_all[tt].size(); rr++)
       {
         num_keys_total += (int) keys_all[tt][rr].size();
-      }				
+      }
       printf("%d ASIFT keypoints are detected. \n", num_keys_total);
   }
 

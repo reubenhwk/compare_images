@@ -66,7 +66,7 @@
 #ifdef _LOCAL_LIBS
 #include "png.h"
 #else
-#include <png.h> 
+#include <png.h>
 /* Guoshen Yu, Windows version, 2010.10.16 */
 /* #include "./libs/png/png.h" */
 #endif

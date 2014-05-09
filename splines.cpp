@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 #include "splines.h"
@@ -41,14 +41,14 @@ void invspline1D(double *c,int size,double *z,int npoles)
 
     /* forward recursion */
     c[0] = initcausal(c,size,z[k]);
-    for (n=1;n<size;n++) 
+    for (n=1;n<size;n++)
       c[n] += z[k]*c[n-1];
 
     /* backwards recursion */
     c[size-1] = initanticausal(c,size,z[k]);
-    for (n=size-1;n--;) 
+    for (n=size-1;n--;)
       c[n] = z[k]*(c[n+1]-c[n]);
-    
+
   }
 }
 
@@ -63,16 +63,16 @@ void finvspline(vector<float> &in,int order,vector<float>& out, int width, int h
 {
   double *c,*d,z[5];
   int npoles,nx,ny,x,y;
- 
+
   ny = height; nx = width;
 
   /* initialize poles of associated z-filter */
-  switch (order) 
+  switch (order)
     {
     case 2: z[0]=-0.17157288;  /* sqrt(8)-3 */
       break;
 
-    case 3: z[0]=-0.26794919;  /* sqrt(3)-2 */ 
+    case 3: z[0]=-0.26794919;  /* sqrt(3)-2 */
       break;
 
     case 4: z[0]=-0.361341; z[1]=-0.0137254;
@@ -80,27 +80,27 @@ void finvspline(vector<float> &in,int order,vector<float>& out, int width, int h
 
     case 5: z[0]=-0.430575; z[1]=-0.0430963;
       break;
-      
+
     case 6: z[0]=-0.488295; z[1]=-0.0816793; z[2]=-0.00141415;
       break;
 
     case 7: z[0]=-0.53528; z[1]=-0.122555; z[2]=-0.00914869;
       break;
-      
+
     case 8: z[0]=-0.574687; z[1]=-0.163035; z[2]=-0.0236323; z[3]=-0.000153821;
       break;
 
     case 9: z[0]=-0.607997; z[1]=-0.201751; z[2]=-0.0432226; z[3]=-0.00212131;
       break;
-      
+
     case 10: z[0]=-0.636551; z[1]=-0.238183; z[2]=-0.065727; z[3]=-0.00752819;
       z[4]=-0.0000169828;
       break;
-      
-    case 11: z[0]=-0.661266; z[1]=-0.27218; z[2]=-0.0897596; z[3]=-0.0166696; 
+
+    case 11: z[0]=-0.661266; z[1]=-0.27218; z[2]=-0.0897596; z[3]=-0.0166696;
       z[4]=-0.000510558;
       break;
-      
+
      default:
       printf("finvspline: order should be in 2..11.\n");
       exit(-1);
@@ -111,25 +111,25 @@ void finvspline(vector<float> &in,int order,vector<float>& out, int width, int h
   /* initialize double array containing image */
   c = (double *)malloc(nx*ny*sizeof(double));
   d = (double *)malloc(nx*ny*sizeof(double));
-  for (x=nx*ny;x--;) 
+  for (x=nx*ny;x--;)
     c[x] = (double)in[x];
 
   /* apply filter on lines */
-  for (y=0;y<ny;y++) 
+  for (y=0;y<ny;y++)
     invspline1D(c+y*nx,nx,z,npoles);
 
   /* transpose */
   for (x=0;x<nx;x++)
-    for (y=0;y<ny;y++) 
+    for (y=0;y<ny;y++)
       d[x*ny+y] = c[y*nx+x];
-      
+
   /* apply filter on columns */
-  for (x=0;x<nx;x++) 
+  for (x=0;x<nx;x++)
     invspline1D(d+x*ny,ny,z,npoles);
 
   /* transpose directy into image */
   for (x=0;x<nx;x++)
-    for (y=0;y<ny;y++) 
+    for (y=0;y<ny;y++)
       out[y*nx+x] = (float)(d[x*ny+y]);
 
   /* free array */
@@ -205,11 +205,11 @@ void splinen(float *c,float t,float *a,int n)
 {
   int i,k;
   float xn;
-  
+
   memset((void *)c,0,(n+1)*sizeof(float));
-  for (k=0;k<=n+1;k++) { 
+  for (k=0;k<=n+1;k++) {
     xn = ipow(t+(float)k,n);
-    for (i=k;i<=n;i++) 
+    for (i=k;i<=n;i++)
       c[i] += a[i-k]*xn;
   }
 }

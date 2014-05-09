@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 #include "homography.h"
@@ -94,7 +94,7 @@ void ComputeH::add(float x, float y, float X, float Y, float w)
         *A++ -= w* x*yX;
     }
     *B++ += w* x*X;
-	
+
     A++; // Equation 2
     *A++ += w* y2;
     A += 2;
@@ -105,7 +105,7 @@ void ComputeH::add(float x, float y, float X, float Y, float w)
         *A++ -= w* y*yX;
     }
     *B++ += w* y*X;
-	
+
     A +=2; // Equation 3
     *A++ += w* x2;
     *A++ += w* xy;
@@ -116,7 +116,7 @@ void ComputeH::add(float x, float y, float X, float Y, float w)
         *A++ -= w* x*yY;
     }
     *B++ += w* x*Y;
-	
+
     A +=3; // Equation 4
     *A++ += w* y2;
     A++;
@@ -126,7 +126,7 @@ void ComputeH::add(float x, float y, float X, float Y, float w)
         *A++ -= w* y*yY;
     }
     *B++ += w* y*Y;
-	 
+
     A+= 4; // Equation 5
     *A++ += w;
     A++;
@@ -135,19 +135,19 @@ void ComputeH::add(float x, float y, float X, float Y, float w)
         *A++ -= w* yX;
     }
     *B++ += w* X;
-	
+
     A += 5; // Equation 6
     *A++ += w;
     *B++ += w* Y;
     if(_type == Projective) {
         *A++ -= w* xY;
         *A++ -= w* yY;
-	
+
         A += 6; // Equation 7
         *A++ += w* (xX*xX + xY*xY);
         *A++ += w* (xX*yX + xY*yY);
         *B++ -= w* (xX*X  + xY*Y);
-	
+
         A+= 7; // Equation 8
         *A++ += w* (yX*yX + yY*yY);
         *B++ -= w* (yX*X  + yY*Y);
@@ -159,7 +159,7 @@ void ComputeH::add(float x, float y, float X, float Y, float w)
 void ComputeH::add_4parameters(float x, float y, float X, float Y, float w)
 {
     double *A = Ann, *B = Bn;
-	
+
     if(_type == Translation) {
         A[0] += w;
         A[3] += w;
@@ -256,7 +256,7 @@ void ComputeH::add(float x, float y, float z, float X, float Y, float Z,
         *A++ += w* (x2+z2) * XZ;
     }
     *B++ -= w* yz * XZ;
-	
+
     A += 2; // Equation 3
     *A++ += w* (y2+z2) * Y2;
     *A++ -= w* xy * Y2;
@@ -303,7 +303,7 @@ void ComputeH::add(float x, float y, float z, float X, float Y, float Z,
         *A++ += w* (x2+z2) * Z2;
         *B++ += w* yz * Z2;
     }
-    b += w* Z2; // *(x2+y2=1) 
+    b += w* Z2; // *(x2+y2=1)
 }
 
 // Add two corresponding lines, type involving at most 4 parameters
@@ -349,7 +349,7 @@ void ComputeH::add_4parameters(float x, float y, float z,
         *B++ -= w* YZ; // *(x2+y2=1)
         return;
     }
-	
+
     if(_type == Zoom) {
         *A++ += w* (z2/* *(X2+Y2=1)*/ + y2*X2 + x2*Y2 - 2*xy*XY);
         *A++ -= w* (yz*XY + xz*X2);
@@ -378,7 +378,7 @@ void ComputeH::add_4parameters(float x, float y, float z,
     A += n-1;
     *A++ += w* Y2; // *(x2+y2=1)
     *B++ -= w* YZ; // *(x2+y2=1)
-}	
+}
 
 // Wrap vector of unknowns `v' into structure `map'
 void ComputeH::wrap(Homography& h, const vector<double>& v) const

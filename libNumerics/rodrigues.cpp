@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 #ifdef RODRIGUES_H
@@ -29,7 +29,7 @@ matrix<T> rotation(vector<T> w)
         w /= n;
         R += skew(sin(n)*w);
         R += (1-c)*w*w.t();
-    }   
+    }
     return R;
 }
 

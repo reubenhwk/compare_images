@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 #ifdef MATRIX_H // Do nothing if not included from matrix.h
@@ -147,7 +147,7 @@ vector<T> vector<T>::copy(int i0, int i1) const
 template <typename T>
 void vector<T>::paste(int i0, const vector<T>& v)
 {
-    matrix<T>::paste(i0, 0, v); 
+    matrix<T>::paste(i0, 0, v);
 }
 
 } // namespace libNumerics

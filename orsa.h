@@ -1,7 +1,7 @@
 //
 // C++ Implementation: stereomatch
 //
-// Description: eliminate the false matches with epipolar geometry constraint. 
+// Description: eliminate the false matches with epipolar geometry constraint.
 //		See http://www.math-info.univ-paris5.fr/~moisan/epipolar/
 //
 // Copyright (c) 2007 Lionel Moisan <Lionel.Moisan@parisdescartes.fr>
@@ -64,7 +64,7 @@ void random_p7(int *k, int n);
 
 
 /* float comparison for qsort() */
-//According to http://www.cplusplus.com/reference/clibrary/cstdlib/qsort/, 
+//According to http://www.cplusplus.com/reference/clibrary/cstdlib/qsort/,
 //we should have: void qsort ( void * base, size_t num, size_t size, int ( * comparator ) ( const void *, const void * ) ); that means, for "qsort", the "comparator" has two constant void* type input parameters
 int compf(const void *i, const void *j);
 

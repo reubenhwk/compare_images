@@ -1,5 +1,5 @@
-// Authors: Unknown. Please, if you are the author of this file, or if you 
-// know who are the authors of this file, let us know, so we can give the 
+// Authors: Unknown. Please, if you are the author of this file, or if you
+// know who are the authors of this file, let us know, so we can give the
 // adequate credits and/or get the adequate authorizations.
 
 #include "numerics.h"
@@ -248,7 +248,7 @@ void SVD::compute()
                     c = g * h;
                     s = - f * h;
                     for (int j=0; j< rows; j++)
-                        rotate(m_U(j,nm),m_U(j,i), c,s); 
+                        rotate(m_U(j,nm),m_U(j,i), c,s);
                 }
             }
             flnum z = m_W(k);
