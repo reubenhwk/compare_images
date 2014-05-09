@@ -59,8 +59,8 @@ using namespace std;
 #include "compute_asift_keypoints.h"
 #include "compute_asift_matches.h"
 
-# define IM_X 800
-# define IM_Y 600
+# define IM_X 256
+# define IM_Y 256
 
 int main(int argc, char **argv)
 {
