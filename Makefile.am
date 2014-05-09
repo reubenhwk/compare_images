@@ -5,12 +5,46 @@ AM_CFLAGS = @OPENMP_CFLAGS@
 AM_CXXFLAGS = @OPENMP_CFLAGS@
 
 noinst_PROGRAMS = \
-	demo_ASIFT
+	demo_ASIFT \
+	extract-keys
 
 noinst_LIBRARIES = \
 	libnumerics.a \
 	libmatch.a \
 	libio_png.a
+
+extract_keys_LDADD = \
+	libnumerics.a \
+	libmatch.a \
+	libio_png.a
+
+extract_keys_SOURCES = \
+	compute_asift_keypoints.cpp \
+	compute_asift_keypoints.h \
+	compute_asift_matches.cpp \
+	compute_asift_matches.h \
+	demo_lib_sift.cpp \
+	demo_lib_sift.h \
+	domain.cpp \
+	domain.h \
+	extract_keys.cpp \
+	filter.cpp \
+	filter.h \
+	flimage.cpp \
+	flimage.h \
+	fproj.cpp \
+	fproj.h \
+	frot.cpp \
+	frot.h \
+	library.cpp \
+	library.h \
+	numerics1.cpp \
+	numerics1.h \
+	orsa.cpp \
+	orsa.h \
+	splines.cpp \
+	splines.h
+
 
 demo_ASIFT_LDADD = \
 	libnumerics.a \
