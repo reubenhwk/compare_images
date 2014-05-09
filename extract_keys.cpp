@@ -36,7 +36,7 @@
 // Reference: J.M. Morel and G.Yu, ASIFT: A New Framework for Fully Affine Invariant Image
 //            Comparison, SIAM Journal on Imaging Sciences, vol. 2, issue 2, pp. 438-469, 2009.
 // Reference: ASIFT online demo (You can try ASIFT with your own images online.)
-//			  http://www.ipol.im/pub/algo/my_affine_sift/
+//                        http://www.ipol.im/pub/algo/my_affine_sift/
 /*---------------------------------------------------------------------------*/
 
 #include <stdio.h>
@@ -59,47 +59,46 @@ using namespace std;
 #include "compute_asift_keypoints.h"
 #include "compute_asift_matches.h"
 
-# define IM_X 256
-# define IM_Y 256
+#define IM_X 256
+#define IM_Y 256
 
 int main(int argc, char **argv)
 {
 
-    if (argc != 3) {
-        std::cerr << " ******************************************************************************* " << std::endl
-		  << " ***************************  ASIFT image matching  **************************** " << std::endl
-		  << " ******************************************************************************* " << std::endl
-		  << "Usage: " << argv[0] << " imgIn1.png keys1.txt" << std::endl
-		  << "- imgIn1.png: input image (in PNG format). " << std::endl
-		  << "- keys1.txt: ASIFT keypoints of the image." << std::endl
-		  << " ******************************************************************************* " << std::endl
-		  << " *********************  Jean-Michel Morel, Guoshen Yu, 2010 ******************** " << std::endl
-		  << " ******************************************************************************* " << std::endl;
-        return 1;
-    }
-
+	if (argc != 3) {
+		std::cerr << " ******************************************************************************* " << std::endl
+		    << " ***************************  ASIFT image matching  **************************** " << std::endl
+		    << " ******************************************************************************* " << std::endl
+		    << "Usage: " << argv[0] << " imgIn1.png keys1.txt" << std::endl
+		    << "- imgIn1.png: input image (in PNG format). " << std::endl
+		    << "- keys1.txt: ASIFT keypoints of the image." << std::endl
+		    << " ******************************************************************************* " << std::endl
+		    << " *********************  Jean-Michel Morel, Guoshen Yu, 2010 ******************** " << std::endl
+		    << " ******************************************************************************* " << std::endl;
+		return 1;
+	}
 	//////////////////////////////////////////////// Input
 	// Read image1
-    float * iarr1;
-    size_t w1, h1;
-    if (NULL == (iarr1 = read_png_f32_gray(argv[1], &w1, &h1))) {
-        std::cerr << "Unable to load image file " << argv[1] << std::endl;
-        return 1;
-    }
-    std::vector<float> ipixels1(iarr1, iarr1 + w1 * h1);
-	free(iarr1); /*memcheck*/
+	float *iarr1;
+	size_t w1, h1;
+	if (NULL == (iarr1 = read_png_f32_gray(argv[1], &w1, &h1))) {
+		std::cerr << "Unable to load image file " << argv[1] << std::endl;
+		return 1;
+	}
+	std::vector < float >ipixels1(iarr1, iarr1 + w1 * h1);
+	free(iarr1);		/*memcheck */
 
 	///// Resize the images to area wS*hW in remaining the apsect-ratio
 	///// Resize if the resize flag is not set or if the flag is set unequal to 0
 	float wS = IM_X;
 	float hS = IM_Y;
 
-	float zoom1=0, zoom2=0;
-	int wS1=0, hS1=0, wS2=0, hS2=0;
-	vector<float> ipixels1_zoom;
+	float zoom1 = 0, zoom2 = 0;
+	int wS1 = 0, hS1 = 0, wS2 = 0, hS2 = 0;
+	vector < float >ipixels1_zoom;
 
 	cout << "WARNING: The input images are resized to " << wS << "x" << hS << " for ASIFT. " << endl
-	<< "         But the results will be normalized to the original image size." << endl << endl;
+	    << "         But the results will be normalized to the original image size." << endl << endl;
 
 	float InitSigma_aa = 1.6;
 
@@ -119,10 +118,10 @@ int main(int argc, char **argv)
 
 	// Resize image 1
 	float area1 = w1 * h1;
-	zoom1 = sqrt(area1/areaS);
+	zoom1 = sqrt(area1 / areaS);
 
-	wS1 = (int) (w1 / zoom1);
-	hS1 = (int) (h1 / zoom1);
+	wS1 = (int)(w1 / zoom1);
+	hS1 = (int)(h1 / zoom1);
 
 	int fproj_sx = wS1;
 	int fproj_sy = hS1;
@@ -135,18 +134,15 @@ int main(int argc, char **argv)
 	float fproj_y3 = hS1;
 
 	/* Anti-aliasing filtering along vertical direction */
-	if ( zoom1 > 1 )
-	{
+	if (zoom1 > 1) {
 		float sigma_aa = InitSigma_aa * zoom1 / 2;
-		GaussianBlur1D(ipixels1,w1,h1,sigma_aa,1);
-		GaussianBlur1D(ipixels1,w1,h1,sigma_aa,0);
+		GaussianBlur1D(ipixels1, w1, h1, sigma_aa, 1);
+		GaussianBlur1D(ipixels1, w1, h1, sigma_aa, 0);
 	}
-
 	// simulate a tilt: subsample the image along the vertical axis by a factor of t.
-	ipixels1_zoom.resize(wS1*hS1);
-	fproj (ipixels1, ipixels1_zoom, w1, h1, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o, &fproj_p,
-		   &fproj_i , fproj_x1 , fproj_y1 , fproj_x2 , fproj_y2 , fproj_x3 , fproj_y3, fproj_x4, fproj_y4);
-
+	ipixels1_zoom.resize(wS1 * hS1);
+	fproj(ipixels1, ipixels1_zoom, w1, h1, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o, &fproj_p,
+	      &fproj_i, fproj_x1, fproj_y1, fproj_x2, fproj_y2, fproj_x3, fproj_y3, fproj_x4, fproj_y4);
 
 	///// Compute ASIFT keypoints
 	// number N of tilts to simulate t = 1, \sqrt{2}, (\sqrt{2})^2, ..., {\sqrt{2}}^(N-1)
@@ -156,9 +152,9 @@ int main(int argc, char **argv)
 	siftPar siftparameters;
 	default_sift_parameters(siftparameters);
 
-	vector< vector< keypointslist > > keys1;
+	vector < vector < keypointslist > >keys1;
 
-	int num_keys1=0;
+	int num_keys1 = 0;
 
 	cout << "Computing keypoints on the image..." << endl;
 	time_t tstart, tend;
@@ -173,22 +169,18 @@ int main(int argc, char **argv)
 	// the file argv[6] (so that the users can match the keypoints with their own matching algorithm if they wish to)
 	// keypoints in the 1st image
 	std::ofstream file_key1(argv[2]);
-	if (file_key1.is_open())
-	{
+	if (file_key1.is_open()) {
 		// Follow the same convention of David Lowe:
 		// the first line contains the number of keypoints and the length of the desciptors (128)
 		file_key1 << num_keys1 << "  " << VecLength << "  " << std::endl;
-		for (int tt = 0; tt < (int) keys1.size(); tt++)
-		{
-			for (int rr = 0; rr < (int) keys1[tt].size(); rr++)
-			{
+		for (int tt = 0; tt < (int)keys1.size(); tt++) {
+			for (int rr = 0; rr < (int)keys1[tt].size(); rr++) {
 				keypointslist::iterator ptr = keys1[tt][rr].begin();
-				for(int i=0; i < (int) keys1[tt][rr].size(); i++, ptr++)
-				{
-					file_key1 << zoom1*ptr->x << "  " << zoom1*ptr->y << "  " << zoom1*ptr->scale << "  " << ptr->angle;
+				for (int i = 0; i < (int)keys1[tt][rr].size(); i++, ptr++) {
+					file_key1 << zoom1 * ptr->x << "  " << zoom1 * ptr->y << "  " << zoom1 *
+					    ptr->scale << "  " << ptr->angle;
 
-					for (int ii = 0; ii < (int) VecLength; ii++)
-					{
+					for (int ii = 0; ii < (int)VecLength; ii++) {
 						file_key1 << "  " << ptr->vec[ii];
 					}
 
@@ -196,13 +188,11 @@ int main(int argc, char **argv)
 				}
 			}
 		}
-	}
-	else
-	{
+	} else {
 		std::cerr << "Unable to open the file keys.";
 	}
 
 	file_key1.close();
 
-    return 0;
+	return 0;
 }
