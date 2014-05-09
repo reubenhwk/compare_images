@@ -85,41 +85,20 @@ sums 5 multiplications at a time to allow the compiler to schedule
 operations better and avoid loop overhead.  This almost triples
 speed of previous version on a Pentium with gcc.
 */
-void ConvBufferFast(float *buffer, float *kernel, int rsize, int ksize)
+inline void ConvBufferFast(float *buffer, float *kernel, int rsize, int ksize)
 {
   int i;
   float *bp, *kp, *endkp;
-  float sum;
 
   for (i = 0; i < rsize; i++) {
-    sum = 0.0;
+    buffer[i] = 0.0;
     bp = &buffer[i];
     kp = &kernel[0];
     endkp = &kernel[ksize];
 
-    /* Loop unrolling: do 5 multiplications at a time. */
-    //      while (kp + 4 < endkp) {
-    //      sum += (double) bp[0] * (double) kp[0] + (double)  bp[1] * (double) kp[1] + (double) bp[2] * (double) kp[2] +
-    //             (double) bp[3] * (double) kp[3] + (double)  bp[4] * (double) kp[4];
-    //      bp += 5;
-    //      kp += 5;
-    //     }
-    //      /* Do 2 multiplications at a time on remaining items. */
-    //     while (kp + 1 < endkp) {
-    //       sum += (double) bp[0] * (double) kp[0] + (double)  bp[1] * (double) kp[1];
-    //	   bp += 2;
-    //	   kp += 2;
-    //	 }
-    //      /* Finish last one if needed. */
-    //		if (kp < endkp) {
-    //		sum += (double) *bp * (double) *kp;
-    //		}
-
     while (kp < endkp) {
-      sum += *bp++ * *kp++;
+      buffer[i] += *bp++ * *kp++;
     }
-
-    buffer[i] = sum;
   }
 }
 
@@ -131,14 +110,12 @@ void ConvHorizontal(vector<float>& image, int width, int height, float *kernel, 
 {
   int rows, cols, r, c, i, halfsize;
   vector<float> buffer;
-  vector<float> pixels(width*height);
 
 
   rows = height;
   cols = width;
 
   halfsize = ksize / 2;
-  pixels = image;
 
   buffer.resize(ksize + cols);
   for (r = 0; r < rows; r++) {
@@ -146,17 +123,16 @@ void ConvHorizontal(vector<float>& image, int width, int height, float *kernel, 
     half the mask size.  This avoids need to check for ends
     within inner loop. */
     for (i = 0; i < halfsize; i++)
-      buffer[i] = pixels[r*cols];
+      buffer[i] = image[r*cols];
     for (i = 0; i < cols; i++)
-      buffer[halfsize + i] = pixels[r*cols+i];
+      buffer[halfsize + i] = image[r*cols+i];
     for (i = 0; i < halfsize; i++)
-      buffer[halfsize + cols + i] = pixels[r*cols+cols-1];
+      buffer[halfsize + cols + i] = image[r*cols+cols-1];
 
     ConvBufferFast(&buffer[0], kernel, cols, ksize);
     for (c = 0; c < cols; c++)
-      pixels[r*cols+c] = buffer[c];
+      image[r*cols+c] = buffer[c];
   }
-  image = pixels;
 }
 
 
@@ -166,29 +142,25 @@ void ConvVertical(vector<float>& image, int width, int height, float *kernel, in
 {
   int rows, cols, r, c, i, halfsize;
   vector<float> buffer;
-  vector<float> pixels(width*height);
 
   rows = height;
   cols = width;
 
   halfsize = ksize / 2;
-  pixels = image;
 
   buffer.resize(ksize + rows);
   for (c = 0; c < cols; c++) {
     for (i = 0; i < halfsize; i++)
-      buffer[i] = pixels[c];
+      buffer[i] = image[c];
     for (i = 0; i < rows; i++)
-      buffer[halfsize + i] = pixels[i*cols+c];
+      buffer[halfsize + i] = image[i*cols+c];
     for (i = 0; i < halfsize; i++)
-      buffer[halfsize + rows + i] = pixels[(rows - 1)*cols+c];
+      buffer[halfsize + rows + i] = image[(rows - 1)*cols+c];
 
     ConvBufferFast(&buffer[0], kernel, rows, ksize);
     for (r = 0; r < rows; r++)
-      pixels[r*cols+c] = buffer[r];
+      image[r*cols+c] = buffer[r];
   }
-
-  image = pixels;
 }
 
 
