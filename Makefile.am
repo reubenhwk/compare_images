@@ -40,6 +40,7 @@ extract_keys_SOURCES = \
 	fproj.h \
 	frot.cpp \
 	frot.h \
+	image_size.h \
 	library.cpp \
 	library.h \
 	numerics1.cpp \
@@ -75,6 +76,7 @@ demo_ASIFT_SOURCES = \
 	fproj.h \
 	frot.cpp \
 	frot.h \
+	image_size.h \
 	library.cpp \
 	library.h \
 	numerics1.cpp \
