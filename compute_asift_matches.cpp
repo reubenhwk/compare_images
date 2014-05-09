@@ -51,7 +51,7 @@
 #endif
 
 #include "compute_asift_matches.h"
-#include "libMatch/match.h"
+#include "lib/match/match.h"
 #include "orsa.h"
 
 
