@@ -4,6 +4,8 @@ AUTOMAKE_OPTIONS = 1.2 foreign subdir-objects
 AM_CFLAGS = @OPENMP_CFLAGS@
 AM_CXXFLAGS = @OPENMP_CFLAGS@
 
+libmagickio_a_CFLAGS = @MagickCore_CFLAGS@
+
 noinst_PROGRAMS = \
 	demo_ASIFT \
 	extract-keys
@@ -11,12 +13,14 @@ noinst_PROGRAMS = \
 noinst_LIBRARIES = \
 	libnumerics.a \
 	libmatch.a \
-	libio_png.a
+	libio_png.a \
+	libmagickio.a
 
 extract_keys_LDADD = \
+	libmagickio.a \
+	@MagickCore_LIBS@ \
 	libnumerics.a \
-	libmatch.a \
-	libio_png.a
+	libmatch.a 
 
 extract_keys_SOURCES = \
 	compute_asift_keypoints.cpp \
@@ -47,6 +51,8 @@ extract_keys_SOURCES = \
 
 
 demo_ASIFT_LDADD = \
+	libmagickio.a \
+	@MagickCore_LIBS@ \
 	libnumerics.a \
 	libmatch.a \
 	libio_png.a
@@ -98,4 +104,9 @@ libmatch_a_SOURCES = \
 	lib/match/match.cpp \
 	lib/match/match.h
 
+libmagickio_a_SOURCES = \
+	lib/magickio/fileio.c \
+	lib/magickio/fileio.h \
+	lib/magickio/magickio.h \
+	lib/magickio/magickio.c
 

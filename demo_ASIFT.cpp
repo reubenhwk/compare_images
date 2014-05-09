@@ -52,6 +52,7 @@ using namespace std;
 
 #include "demo_lib_sift.h"
 #include "lib/io_png/io_png.h"
+#include "lib/magickio/magickio.h"
 
 #include "library.h"
 #include "frot.h"
@@ -87,7 +88,7 @@ int main(int argc, char **argv)
 	// Read image1
     float * iarr1;
     size_t w1, h1;
-    if (NULL == (iarr1 = read_png_f32_gray(argv[1], &w1, &h1))) {
+    if (NULL == (iarr1 = read_img_f32_gray(argv[1], &w1, &h1))) {
         std::cerr << "Unable to load image file " << argv[1] << std::endl;
         return 1;
     }
@@ -97,7 +98,7 @@ int main(int argc, char **argv)
 	// Read image2
     float * iarr2;
     size_t w2, h2;
-    if (NULL == (iarr2 = read_png_f32_gray(argv[2], &w2, &h2))) {
+    if (NULL == (iarr2 = read_img_f32_gray(argv[2], &w2, &h2))) {
         std::cerr << "Unable to load image file " << argv[2] << std::endl;
         return 1;
     }

@@ -8,7 +8,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)])
 
 
 dnl Determine CC and preset CFLAGS
-AC_PROG_CC
+AC_PROG_CC_C99
 AC_PROG_CXX
 AC_PROG_RANLIB
 
@@ -17,6 +17,7 @@ AC_CHECK_HEADERS([eigen3/Eigen/Cholesky])
 AC_LANG_POP([C++])
 
 AC_SEARCH_LIBS(png_init_io, png)
+PKG_CHECK_MODULES(MagickCore, MagickCore, HAVE_IMAGEMAGICK=yes, HAVE_IMAGEMAGICK=no)
 
 AC_OPENMP
 AC_SUBST(OPENMP_CFLAGS)
