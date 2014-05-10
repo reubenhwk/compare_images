@@ -179,6 +179,7 @@ void GaussianBlur1D(vector<float>& image, int width, int height, float sigma, in
   */
   ksize = (int)(2.0 * GaussTruncate1 * sigma + 1.0);
   ksize = MAX(3, ksize);    /* Kernel must be at least 3. */
+  ksize = MIN(99, ksize);    /* Kernel must be no more than 100. */
   if (ksize % 2 == 0)       /* Make kernel size odd. */
     ksize++;
   assert(ksize < 100);
