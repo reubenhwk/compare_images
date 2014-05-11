@@ -36,9 +36,8 @@
 // Reference: J.M. Morel and G.Yu, ASIFT: A New Framework for Fully Affine Invariant Image
 //            Comparison, SIAM Journal on Imaging Sciences, vol. 2, issue 2, pp. 438-469, 2009.
 // Reference: ASIFT online demo (You can try ASIFT with your own images online.)
-//			  http://www.ipol.im/pub/algo/my_affine_sift/
+//                        http://www.ipol.im/pub/algo/my_affine_sift/
 /*---------------------------------------------------------------------------*/
-
 
 #include <assert.h>
 #include <stdlib.h>
@@ -51,9 +50,7 @@
 #include <omp.h>
 #endif
 
-
 #define ABS(x)    (((x) > 0) ? (x) : (-(x)))
-
 
 /* InitSigma gives the amount of smoothing applied to the image at the
 first level of each octave.  In effect, this determines the sampling
@@ -74,9 +71,7 @@ keypoint consistency, and a value of 4.0 is better than 3.0.
 */
 const float GaussTruncate1 = 4.0;
 
-
 /* --------------------------- Blur image --------------------------- */
-
 
 /* Same as ConvBuffer, but implemented with loop unrolling for increased
 speed.  This is the most time intensive routine in keypoint detection,
@@ -87,171 +82,158 @@ speed of previous version on a Pentium with gcc.
 */
 inline void ConvBufferFast(float *buffer, float *kernel, int rsize, int ksize)
 {
-  int i;
-  float *bp, *kp, *endkp;
+	int i;
+	float *bp, *kp, *endkp;
 
-  for (i = 0; i < rsize; i++) {
-    buffer[i] = 0.0;
-    bp = &buffer[i];
-    kp = &kernel[0];
-    endkp = &kernel[ksize];
+	for (i = 0; i < rsize; i++) {
+		buffer[i] = 0.0;
+		bp = &buffer[i];
+		kp = &kernel[0];
+		endkp = &kernel[ksize];
 
-    while (kp < endkp) {
-      buffer[i] += *bp++ * *kp++;
-    }
-  }
+		while (kp < endkp) {
+			buffer[i] += *bp++ * *kp++;
+		}
+	}
 }
 
 /* Convolve image with the 1-D kernel vector along image rows.  This
 is designed to be as efficient as possible.  Pixels outside the
 image are set to the value of the closest image pixel.
 */
-void ConvHorizontal(vector<float>& image, int width, int height, float *kernel, int ksize)
+void ConvHorizontal(vector < float >&image, int width, int height, float *kernel, int ksize)
 {
-  int rows, cols, r, c, i, halfsize;
-  vector<float> buffer;
+	int rows, cols, r, c, i, halfsize;
+	vector < float >buffer;
 
+	rows = height;
+	cols = width;
 
-  rows = height;
-  cols = width;
+	halfsize = ksize / 2;
 
-  halfsize = ksize / 2;
+	buffer.resize(ksize + cols);
+	for (r = 0; r < rows; r++) {
+		/* Copy the row into buffer with pixels at ends replicated for
+		   half the mask size.  This avoids need to check for ends
+		   within inner loop. */
+		for (i = 0; i < halfsize; i++)
+			buffer[i] = image[r * cols];
+		for (i = 0; i < cols; i++)
+			buffer[halfsize + i] = image[r * cols + i];
+		for (i = 0; i < halfsize; i++)
+			buffer[halfsize + cols + i] = image[r * cols + cols - 1];
 
-  buffer.resize(ksize + cols);
-  for (r = 0; r < rows; r++) {
-    /* Copy the row into buffer with pixels at ends replicated for
-    half the mask size.  This avoids need to check for ends
-    within inner loop. */
-    for (i = 0; i < halfsize; i++)
-      buffer[i] = image[r*cols];
-    for (i = 0; i < cols; i++)
-      buffer[halfsize + i] = image[r*cols+i];
-    for (i = 0; i < halfsize; i++)
-      buffer[halfsize + cols + i] = image[r*cols+cols-1];
-
-    ConvBufferFast(&buffer[0], kernel, cols, ksize);
-    for (c = 0; c < cols; c++)
-      image[r*cols+c] = buffer[c];
-  }
+		ConvBufferFast(&buffer[0], kernel, cols, ksize);
+		for (c = 0; c < cols; c++)
+			image[r * cols + c] = buffer[c];
+	}
 }
-
 
 /* Same as ConvHorizontal, but apply to vertical columns of image.
 */
-void ConvVertical(vector<float>& image, int width, int height, float *kernel, int ksize)
+void ConvVertical(vector < float >&image, int width, int height, float *kernel, int ksize)
 {
-  int rows, cols, r, c, i, halfsize;
-  vector<float> buffer;
+	int rows, cols, r, c, i, halfsize;
+	vector < float >buffer;
 
-  rows = height;
-  cols = width;
+	rows = height;
+	cols = width;
 
-  halfsize = ksize / 2;
+	halfsize = ksize / 2;
 
-  buffer.resize(ksize + rows);
-  for (c = 0; c < cols; c++) {
-    for (i = 0; i < halfsize; i++)
-      buffer[i] = image[c];
-    for (i = 0; i < rows; i++)
-      buffer[halfsize + i] = image[i*cols+c];
-    for (i = 0; i < halfsize; i++)
-      buffer[halfsize + rows + i] = image[(rows - 1)*cols+c];
+	buffer.resize(ksize + rows);
+	for (c = 0; c < cols; c++) {
+		for (i = 0; i < halfsize; i++)
+			buffer[i] = image[c];
+		for (i = 0; i < rows; i++)
+			buffer[halfsize + i] = image[i * cols + c];
+		for (i = 0; i < halfsize; i++)
+			buffer[halfsize + rows + i] = image[(rows - 1) * cols + c];
 
-    ConvBufferFast(&buffer[0], kernel, rows, ksize);
-    for (r = 0; r < rows; r++)
-      image[r*cols+c] = buffer[r];
-  }
+		ConvBufferFast(&buffer[0], kernel, rows, ksize);
+		for (r = 0; r < rows; r++)
+			image[r * cols + c] = buffer[r];
+	}
 }
-
-
 
 /* 1D Convolve image with a Gaussian of width sigma and store result back
 in image.   This routine creates the Gaussian kernel, and then applies
 it in horizontal (flag_dir=0) OR vertical directions (flag_dir!=0).
 */
-void GaussianBlur1D(vector<float>& image, int width, int height, float sigma, int flag_dir)
+void GaussianBlur1D(vector < float >&image, int width, int height, float sigma, int flag_dir)
 {
-  float x, kernel[100], sum = 0.0;
-  int ksize, i;
+	float x, kernel[100], sum = 0.0;
+	int ksize, i;
 
-  /* The Gaussian kernel is truncated at GaussTruncate sigmas from
-  center.  The kernel size should be odd.
-  */
-  ksize = (int)(2.0 * GaussTruncate1 * sigma + 1.0);
-  ksize = MAX(3, ksize);    /* Kernel must be at least 3. */
-  ksize = MIN(99, ksize);    /* Kernel must be no more than 100. */
-  if (ksize % 2 == 0)       /* Make kernel size odd. */
-    ksize++;
-  assert(ksize < 100);
+	/* The Gaussian kernel is truncated at GaussTruncate sigmas from
+	   center.  The kernel size should be odd.
+	 */
+	ksize = (int)(2.0 * GaussTruncate1 * sigma + 1.0);
+	ksize = MAX(3, ksize);	/* Kernel must be at least 3. */
+	ksize = MIN(99, ksize);	/* Kernel must be no more than 100. */
+	if (ksize % 2 == 0)	/* Make kernel size odd. */
+		ksize++;
+	assert(ksize < 100);
 
-  /* Fill in kernel values. */
-  for (i = 0; i <= ksize; i++) {
-    x = i - ksize / 2;
-    kernel[i] = exp(- x * x / (2.0 * sigma * sigma));
-    sum += kernel[i];
-  }
-  /* Normalize kernel values to sum to 1.0. */
-  for (i = 0; i < ksize; i++)
-    kernel[i] /= sum;
+	/* Fill in kernel values. */
+	for (i = 0; i <= ksize; i++) {
+		x = i - ksize / 2;
+		kernel[i] = exp(-x * x / (2.0 * sigma * sigma));
+		sum += kernel[i];
+	}
+	/* Normalize kernel values to sum to 1.0. */
+	for (i = 0; i < ksize; i++)
+		kernel[i] /= sum;
 
-  if (flag_dir == 0)
-  {
-    ConvHorizontal(image, width, height, kernel, ksize);
-  }
-  else
-  {
-    ConvVertical(image, width, height, kernel, ksize);
-  }
+	if (flag_dir == 0) {
+		ConvHorizontal(image, width, height, kernel, ksize);
+	} else {
+		ConvVertical(image, width, height, kernel, ksize);
+	}
 }
-
 
 void compensate_affine_coor1(float *x0, float *y0, int w1, int h1, float t1, float t2, float Rtheta)
 {
-  float x_ori, y_ori;
-  float x_tmp, y_tmp;
+	float x_ori, y_ori;
+	float x_tmp, y_tmp;
 
-  float x1 = *x0;
-  float y1 = *y0;
+	float x1 = *x0;
+	float y1 = *y0;
 
+	Rtheta = Rtheta * PI / 180;
 
-  Rtheta = Rtheta*PI/180;
+	if (Rtheta <= PI / 2) {
+		x_ori = 0;
+		y_ori = w1 * sin(Rtheta) / t1;
+	} else {
+		x_ori = -w1 * cos(Rtheta) / t2;
+		y_ori = (w1 * sin(Rtheta) + h1 * sin(Rtheta - PI / 2)) / t1;
+	}
 
-  if ( Rtheta <= PI/2 )
-  {
-    x_ori = 0;
-    y_ori = w1 * sin(Rtheta) / t1;
-  }
-  else
-  {
-    x_ori = -w1 * cos(Rtheta) / t2;
-    y_ori = ( w1 * sin(Rtheta) + h1 * sin(Rtheta-PI/2) ) / t1;
-  }
+	float sin_Rtheta = sin(Rtheta);
+	float cos_Rtheta = cos(Rtheta);
 
-  float sin_Rtheta = sin(Rtheta);
-  float cos_Rtheta = cos(Rtheta);
+	/* project the coordinates of im1 to original image before tilt-rotation transform */
+	/* Get the coordinates with respect to the 'origin' of the original image before transform */
+	x1 = x1 - x_ori;
+	y1 = y1 - y_ori;
+	/* Invert tilt */
+	x1 = x1 * t2;
+	y1 = y1 * t1;
+	/* Invert rotation (Note that the y direction (vertical) is inverse to the usual concention. Hence Rtheta instead of -Rtheta to inverse the rotation.) */
+	x_tmp = cos_Rtheta * x1 - sin_Rtheta * y1;
+	y_tmp = sin_Rtheta * x1 + cos_Rtheta * y1;
+	x1 = x_tmp;
+	y1 = y_tmp;
 
-
-  /* project the coordinates of im1 to original image before tilt-rotation transform */
-  /* Get the coordinates with respect to the 'origin' of the original image before transform */
-  x1 = x1 - x_ori;
-  y1 = y1 - y_ori;
-  /* Invert tilt */
-  x1 = x1 * t2;
-  y1 = y1 * t1;
-  /* Invert rotation (Note that the y direction (vertical) is inverse to the usual concention. Hence Rtheta instead of -Rtheta to inverse the rotation.) */
-  x_tmp = cos_Rtheta*x1 - sin_Rtheta*y1;
-  y_tmp = sin_Rtheta*x1 + cos_Rtheta*y1;
-  x1 = x_tmp;
-  y1 = y_tmp;
-
-  *x0 = x1;
-  *y0 = y1;
+	*x0 = x1;
+	*y0 = y1;
 }
-
 
 /* -------------- MAIN FUNCTION ---------------------- */
 
-int compute_asift_keypoints(vector<float>& image, int width, int height, int num_of_tilts, int verb, vector< vector< keypointslist > >& keys_all, siftPar &siftparameters)
+int compute_asift_keypoints(vector < float >&image, int width, int height, int num_of_tilts, int verb,
+			    vector < vector < keypointslist > >&keys_all, siftPar & siftparameters)
 // Compute ASIFT keypoints in the input image.
 // Input:
 // image: input image
@@ -259,284 +241,273 @@ int compute_asift_keypoints(vector<float>& image, int width, int height, int num
 // num_of_tilts: number of tilts to simulate.
 // verb: 1/0 --> show/don not show verbose messages. (1 for debugging)
 // keys_all (output): ASIFT keypoints. It is a 2D matrix with varying rows and columns. Each entry keys_all[tt][rr]
-//	stores the SIFT keypoints calculated on the image with the simulated tilt index tt and simulated rotation index rr (see the code below). In the coordinates of the keypoints,
-//	the affine distortions have been compensated.
+//      stores the SIFT keypoints calculated on the image with the simulated tilt index tt and simulated rotation index rr (see the code below). In the coordinates of the keypoints,
+//      the affine distortions have been compensated.
 // siftparameters: SIFT parameters.
 //
 // Output: the number of keypoints
 {
-  vector<float> image_t, image_tmp1, image_tmp;
+	vector < float >image_t, image_tmp1, image_tmp;
 
-  float t_min, t_k;
-  int num_tilt, tt, num_rot_t2, rr;
-  int fproj_o;
-  float fproj_p, fproj_bg;
-  char fproj_i;
-  float *fproj_x4, *fproj_y4;
-  //  float frot_b=0;
-  float frot_b=128;
-  char *frot_k;
-  int  counter_sim=0, num_sim;
-  int flag_dir = 1;
-  float BorderFact=6*sqrt(2.);
+	float t_min, t_k;
+	int num_tilt, tt, num_rot_t2, rr;
+	int fproj_o;
+	float fproj_p, fproj_bg;
+	char fproj_i;
+	float *fproj_x4, *fproj_y4;
+	//  float frot_b=0;
+	float frot_b = 128;
+	char *frot_k;
+	int counter_sim = 0, num_sim;
+	int flag_dir = 1;
+	float BorderFact = 6 * sqrt(2.);
 
-  int num_keys_total=0;
+	int num_keys_total = 0;
 
+	fproj_o = 3;
+	fproj_p = 0;
+	fproj_i = 0;
+	fproj_bg = 0;
+	fproj_x4 = 0;
+	fproj_y4 = 0;
 
-  fproj_o = 3;
-  fproj_p = 0;
-  fproj_i = 0;
-  fproj_bg = 0;
-  fproj_x4 = 0;
-  fproj_y4 = 0;
+	frot_k = 0;
 
-  frot_k = 0;
+	num_rot_t2 = 10;
 
-  num_rot_t2 = 10;
+	t_min = 1;
+	t_k = sqrt(2.);
 
-  t_min = 1;
-  t_k = sqrt(2.);
+	num_tilt = num_of_tilts;
 
+	if (num_tilt < 1) {
+		printf("Number of tilts num_tilt should be equal or larger than 1. \n");
+		exit(-1);
+	}
 
-  num_tilt = num_of_tilts;
+	image_tmp1 = image;
 
+	/* Calculate the number of simulations, and initialize keys_all */
+	keys_all = std::vector < vector < keypointslist > >(num_tilt);
+	for (tt = 1; tt <= num_tilt; tt++) {
+		float t = t_min * pow(t_k, tt - 1);
 
-  if ( num_tilt < 1)
-  {
-    printf("Number of tilts num_tilt should be equal or larger than 1. \n");
-    exit(-1);
-  }
+		if (t == 1) {
+			counter_sim++;
 
-  image_tmp1 = image;
+			keys_all[tt - 1] = std::vector < keypointslist > (1);
+		} else {
+			int num_rot1 = round(num_rot_t2 * t / 2);
+			if (num_rot1 % 2 == 1) {
+				num_rot1 = num_rot1 + 1;
+			}
+			num_rot1 = num_rot1 / 2;
+			counter_sim += num_rot1;
 
+			keys_all[tt - 1] = std::vector < keypointslist > (num_rot1);
+		}
+	}
 
-  /* Calculate the number of simulations, and initialize keys_all */
-  keys_all = std::vector< vector< keypointslist > >(num_tilt);
-  for (tt = 1; tt <= num_tilt; tt++)
-  {
-    float t = t_min * pow(t_k, tt-1);
+	num_sim = counter_sim;
 
-    if ( t == 1 )
-    {
-      counter_sim ++;
+	if (verb) {
+		printf("%d affine simulations will be performed. \n", num_sim);
+	}
 
-      keys_all[tt-1] = std::vector< keypointslist >(1);
-    }
-    else
-    {
-      int num_rot1 = round(num_rot_t2*t/2);
-      if ( num_rot1%2 == 1 )
-      {
-        num_rot1 = num_rot1 + 1;
-      }
-      num_rot1 = num_rot1 / 2;
-      counter_sim +=  num_rot1;
+	counter_sim = 0;
 
-      keys_all[tt-1] = std::vector< keypointslist >(num_rot1);
-    }
-  }
-
-  num_sim = counter_sim;
-
-  if ( verb )
-  {
-    printf("%d affine simulations will be performed. \n", num_sim);
-  }
-
-  counter_sim = 0;
-
-
-
-  /* Affine simulation (rotation+tilt simulation) */
-  // Loop on tilts.
+	/* Affine simulation (rotation+tilt simulation) */
+	// Loop on tilts.
 #ifdef _OPENMP
-  omp_set_nested(1);
+	omp_set_nested(1);
 #endif
 #pragma omp parallel for private(tt)
-  for (tt = 1; tt <= num_tilt; tt++)
-  {
-    float t = t_min * pow(t_k, tt-1);
+	for (tt = 1; tt <= num_tilt; tt++) {
+		float t = t_min * pow(t_k, tt - 1);
 
-    float t1 = 1;
-    float t2 = 1/t;
+		float t1 = 1;
+		float t2 = 1 / t;
 
-    // If tilt t = 1, do not simulate rotation.
-    if ( t == 1 )
-    {
-      // copy the image from vector to array as compute_sift_keypoints uses only array.
-      float *image_tmp1_float = new float[width*height];
-      for (int cc = 0; cc < width*height; cc++)
-        image_tmp1_float[cc] = image_tmp1[cc];
+		// If tilt t = 1, do not simulate rotation.
+		if (t == 1) {
+			// copy the image from vector to array as compute_sift_keypoints uses only array.
+			float *image_tmp1_float = new float[width * height];
+			for (int cc = 0; cc < width * height; cc++)
+				image_tmp1_float[cc] = image_tmp1[cc];
 
-      compute_sift_keypoints(image_tmp1_float,keys_all[tt-1][0],width,height,siftparameters);
+			compute_sift_keypoints(image_tmp1_float, keys_all[tt - 1][0], width, height, siftparameters);
 
-      delete[] image_tmp1_float;
+			delete[]image_tmp1_float;
 
-    }
-    else
-    {
-      // The number of rotations to simulate under the current tilt.
-      int num_rot1 = round(num_rot_t2*t/2);
+		} else {
+			// The number of rotations to simulate under the current tilt.
+			int num_rot1 = round(num_rot_t2 * t / 2);
 
-      if ( num_rot1%2 == 1 )
-      {
-        num_rot1 = num_rot1 + 1;
-      }
-      num_rot1 = num_rot1 / 2;
-      float delta_theta = PI/num_rot1;
+			if (num_rot1 % 2 == 1) {
+				num_rot1 = num_rot1 + 1;
+			}
+			num_rot1 = num_rot1 / 2;
+			float delta_theta = PI / num_rot1;
 
-      // Loop on rotations.
+			// Loop on rotations.
 #pragma omp parallel for private(rr)
-      for ( int rr = 1; rr <= num_rot1; rr++ )
-      {
-        float theta = delta_theta * (rr-1);
-        theta = theta * 180 / PI;
+			for (int rr = 1; rr <= num_rot1; rr++) {
+				float theta = delta_theta * (rr - 1);
+				theta = theta * 180 / PI;
 
-        vector<float> image_t;
-        int width_r, height_r;
+				vector < float >image_t;
+				int width_r, height_r;
 
-        // simulate a rotation: rotate the image with an angle theta. (the outside of the rotated image are padded with the value frot_b)
-        frot(image, image_t, width, height, &width_r, &height_r, &theta, &frot_b , frot_k);
+				// simulate a rotation: rotate the image with an angle theta. (the outside of the rotated image are padded with the value frot_b)
+				frot(image, image_t, width, height, &width_r, &height_r, &theta, &frot_b, frot_k);
 
-        /* Tilt */
-        int width_t = (int) (width_r * t1);
-        int height_t = (int) (height_r * t2);
+				/* Tilt */
+				int width_t = (int)(width_r * t1);
+				int height_t = (int)(height_r * t2);
 
-        int fproj_sx = width_t;
-        int fproj_sy = height_t;
+				int fproj_sx = width_t;
+				int fproj_sy = height_t;
 
-        float fproj_x1 = 0;
-        float fproj_y1 = 0;
-        float fproj_x2 = width_t;
-        float fproj_y2 = 0;
-        float fproj_x3 = 0;
-        float fproj_y3 = height_t;
+				float fproj_x1 = 0;
+				float fproj_y1 = 0;
+				float fproj_x2 = width_t;
+				float fproj_y2 = 0;
+				float fproj_x3 = 0;
+				float fproj_y3 = height_t;
 
-        /* Anti-aliasing filtering along vertical direction */
-        /* sigma_aa = InitSigma_aa * log2(t);*/
-        float sigma_aa = InitSigma_aa * t / 2;
-        GaussianBlur1D(image_t,width_r,height_r,sigma_aa,flag_dir);
+				/* Anti-aliasing filtering along vertical direction */
+				/* sigma_aa = InitSigma_aa * log2(t); */
+				float sigma_aa = InitSigma_aa * t / 2;
+				GaussianBlur1D(image_t, width_r, height_r, sigma_aa, flag_dir);
 
+				// simulate a tilt: subsample the image along the vertical axis by a factor of t.
+				vector < float >image_tmp(width_t * height_t);
+				fproj(image_t, image_tmp, width_r, height_r, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o,
+				      &fproj_p, &fproj_i, fproj_x1, fproj_y1, fproj_x2, fproj_y2, fproj_x3, fproj_y3,
+				      fproj_x4, fproj_y4);
 
-        // simulate a tilt: subsample the image along the vertical axis by a factor of t.
-        vector<float> image_tmp(width_t*height_t);
-        fproj (image_t, image_tmp, width_r, height_r, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o, &fproj_p, &fproj_i , fproj_x1 , fproj_y1 , fproj_x2 , fproj_y2 , fproj_x3 , fproj_y3, fproj_x4, fproj_y4);
+				vector < float >image_tmp1 = image_tmp;
 
-        vector<float> image_tmp1 = image_tmp;
+				if (verb) {
+					printf("Rotation theta = %.2f, Tilt t = %.2f. w=%d, h=%d, sigma_aa=%.2f, \n", theta,
+					       t, width_t, height_t, sigma_aa);
+				}
 
-        if ( verb )
-        {
-          printf("Rotation theta = %.2f, Tilt t = %.2f. w=%d, h=%d, sigma_aa=%.2f, \n", theta, t, width_t, height_t, sigma_aa);
-        }
+				float *image_tmp1_float = new float[width_t * height_t];
+				for (int cc = 0; cc < width_t * height_t; cc++)
+					image_tmp1_float[cc] = image_tmp1[cc];
 
+				// compute SIFT keypoints on simulated image.
+				keypointslist keypoints;
+				keypointslist keypoints_filtered;
+				compute_sift_keypoints(image_tmp1_float, keypoints, width_t, height_t, siftparameters);
 
-        float *image_tmp1_float = new float[width_t*height_t];
-        for (int cc = 0; cc < width_t*height_t; cc++)
-          image_tmp1_float[cc] = image_tmp1[cc];
+				delete[]image_tmp1_float;
 
-        // compute SIFT keypoints on simulated image.
-        keypointslist keypoints;
-        keypointslist keypoints_filtered;
-        compute_sift_keypoints(image_tmp1_float,keypoints,width_t,height_t,siftparameters);
+				/* check if the keypoint is located on the boundary of the parallelogram (i.e., the boundary of the distorted input image). If so, remove it to avoid boundary artifacts. */
+				if (keypoints.size() != 0) {
+					for (int cc = 0; cc < (int)keypoints.size(); cc++) {
 
-        delete[] image_tmp1_float;
+						float x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, d1, d2, d3, d4, scale1, theta1,
+						    sin_theta1, cos_theta1, BorderTh;
 
-        /* check if the keypoint is located on the boundary of the parallelogram (i.e., the boundary of the distorted input image). If so, remove it to avoid boundary artifacts. */
-        if ( keypoints.size() != 0 )
-        {
-          for ( int cc = 0; cc < (int) keypoints.size(); cc++ )
-          {
+						x0 = keypoints[cc].x;
+						y0 = keypoints[cc].y;
+						scale1 = keypoints[cc].scale;
 
-            float x0, y0, x1, y1, x2, y2, x3, y3 ,x4, y4, d1, d2, d3, d4, scale1, theta1, sin_theta1, cos_theta1, BorderTh;
+						theta1 = theta * PI / 180;
+						sin_theta1 = sin(theta1);
+						cos_theta1 = cos(theta1);
 
-            x0 = keypoints[cc].x;
-            y0 = keypoints[cc].y;
-            scale1= keypoints[cc].scale;
+						/* the coordinates of the 4 submits of the parallelogram */
+						if (theta <= 90) {
+							x1 = height * sin_theta1;
+							y1 = 0;
+							y2 = width * sin_theta1;
+							x3 = width * cos_theta1;
+							x4 = 0;
+							y4 = height * cos_theta1;
+							x2 = x1 + x3;
+							y3 = y2 + y4;
 
-            theta1 = theta * PI / 180;
-            sin_theta1 = sin(theta1);
-            cos_theta1 = cos(theta1);
+							/* note that the vertical direction goes from top to bottom!!!
+							   The calculation above assumes that the vertical direction goes from the bottom to top. Thus the vertical coordinates need to be reversed!!! */
+							y1 = y3 - y1;
+							y2 = y3 - y2;
+							y4 = y3 - y4;
+							y3 = 0;
 
-            /* the coordinates of the 4 submits of the parallelogram */
-            if ( theta <= 90 )
-            {
-              x1 = height * sin_theta1;
-              y1 = 0;
-              y2 = width * sin_theta1;
-              x3 = width * cos_theta1;
-              x4 = 0;
-              y4 = height * cos_theta1;
-              x2 = x1 + x3;
-              y3 = y2 + y4;
+							y1 = y1 * t2;
+							y2 = y2 * t2;
+							y3 = y3 * t2;
+							y4 = y4 * t2;
+						} else {
+							y1 = -height * cos_theta1;
+							x2 = height * sin_theta1;
+							x3 = 0;
+							y3 = width * sin_theta1;
+							x4 = -width * cos_theta1;
+							y4 = 0;
+							x1 = x2 + x4;
+							y2 = y1 + y3;
 
-              /* note that the vertical direction goes from top to bottom!!!
-              The calculation above assumes that the vertical direction goes from the bottom to top. Thus the vertical coordinates need to be reversed!!! */
-              y1 = y3 - y1;
-              y2 = y3 - y2;
-              y4 = y3 - y4;
-              y3 = 0;
+							/* note that the vertical direction goes from top to bottom!!!
+							   The calculation above assumes that the vertical direction goes from the bottom to top. Thus the vertical coordinates need to be reversed!!! */
+							y1 = y2 - y1;
+							y3 = y2 - y3;
+							y4 = y2 - y4;
+							y2 = 0;
 
-              y1 = y1 * t2;
-              y2 = y2 * t2;
-              y3 = y3 * t2;
-              y4 = y4 * t2;
-            }
-            else
-            {
-              y1 = -height * cos_theta1;
-              x2 = height * sin_theta1;
-              x3 = 0;
-              y3 = width * sin_theta1;
-              x4 = -width * cos_theta1;
-              y4 = 0;
-              x1 = x2 + x4;
-              y2 = y1 + y3;
+							y1 = y1 * t2;
+							y2 = y2 * t2;
+							y3 = y3 * t2;
+							y4 = y4 * t2;
+						}
 
-              /* note that the vertical direction goes from top to bottom!!!
-              The calculation above assumes that the vertical direction goes from the bottom to top. Thus the vertical coordinates need to be reversed!!! */
-              y1 = y2 - y1;
-              y3 = y2 - y3;
-              y4 = y2 - y4;
-              y2 = 0;
+						/* the distances from the keypoint to the 4 sides of the parallelogram */
+						d1 = ABS((x2 - x1) * (y1 - y0) -
+							 (x1 - x0) * (y2 - y1)) / sqrt((x2 - x1) * (x2 - x1) + (y2 -
+														y1) * (y2 -
+														       y1));
+						d2 = ABS((x3 - x2) * (y2 - y0) -
+							 (x2 - x0) * (y3 - y2)) / sqrt((x3 - x2) * (x3 - x2) + (y3 -
+														y2) * (y3 -
+														       y2));
+						d3 = ABS((x4 - x3) * (y3 - y0) -
+							 (x3 - x0) * (y4 - y3)) / sqrt((x4 - x3) * (x4 - x3) + (y4 -
+														y3) * (y4 -
+														       y3));
+						d4 = ABS((x1 - x4) * (y4 - y0) -
+							 (x4 - x0) * (y1 - y4)) / sqrt((x1 - x4) * (x1 - x4) + (y1 -
+														y4) * (y1 -
+														       y4));
 
-              y1 = y1 * t2;
-              y2 = y2 * t2;
-              y3 = y3 * t2;
-              y4 = y4 * t2;
-            }
+						BorderTh = BorderFact * scale1;
 
-            /* the distances from the keypoint to the 4 sides of the parallelogram */
-            d1 = ABS((x2-x1)*(y1-y0)-(x1-x0)*(y2-y1)) / sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
-            d2 = ABS((x3-x2)*(y2-y0)-(x2-x0)*(y3-y2)) / sqrt((x3-x2)*(x3-x2)+(y3-y2)*(y3-y2));
-            d3 = ABS((x4-x3)*(y3-y0)-(x3-x0)*(y4-y3)) / sqrt((x4-x3)*(x4-x3)+(y4-y3)*(y4-y3));
-            d4 = ABS((x1-x4)*(y4-y0)-(x4-x0)*(y1-y4)) / sqrt((x1-x4)*(x1-x4)+(y1-y4)*(y1-y4));
+						if (!
+						    ((d1 < BorderTh) || (d2 < BorderTh) || (d3 < BorderTh)
+						     || (d4 < BorderTh))) {
+							// Normalize the coordinates of the matched points by compensate the simulate affine transformations
+							compensate_affine_coor1(&x0, &y0, width, height, 1 / t2, t1, theta);
+							keypoints[cc].x = x0;
+							keypoints[cc].y = y0;
 
-            BorderTh = BorderFact*scale1;
+							keypoints_filtered.push_back(keypoints[cc]);
+						}
+					}
+				}
+				keys_all[tt - 1][rr - 1] = keypoints_filtered;
+			}
+		}
+	}
 
-            if (!((d1<BorderTh) || (d2<BorderTh) || (d3<BorderTh) || (d4<BorderTh) ))
-            {
-              // Normalize the coordinates of the matched points by compensate the simulate affine transformations
-              compensate_affine_coor1(&x0, &y0, width, height, 1/t2, t1, theta);
-              keypoints[cc].x = x0;
-              keypoints[cc].y = y0;
+	{
+		for (tt = 0; tt < (int)keys_all.size(); tt++)
+			for (rr = 0; rr < (int)keys_all[tt].size(); rr++) {
+				num_keys_total += (int)keys_all[tt][rr].size();
+			}
+		printf("%d ASIFT keypoints are detected. \n", num_keys_total);
+	}
 
-              keypoints_filtered.push_back(keypoints[cc]);
-            }
-          }
-        }
-        keys_all[tt-1][rr-1] = keypoints_filtered;
-      }
-    }
-  }
-
-  {
-    for (tt = 0; tt < (int) keys_all.size(); tt++)
-      for (rr = 0; rr < (int) keys_all[tt].size(); rr++)
-      {
-        num_keys_total += (int) keys_all[tt][rr].size();
-      }
-      printf("%d ASIFT keypoints are detected. \n", num_keys_total);
-  }
-
-  return num_keys_total;
+	return num_keys_total;
 }

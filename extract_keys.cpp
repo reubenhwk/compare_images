@@ -65,7 +65,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-	if (argc != 3) {
+	if (argc < 3) {
 		std::cerr << " ******************************************************************************* " << std::endl
 		    << " ***************************  ASIFT image matching  **************************** " << std::endl
 		    << " ******************************************************************************* " << std::endl
@@ -77,126 +77,130 @@ int main(int argc, char **argv)
 		    << " ******************************************************************************* " << std::endl;
 		return 1;
 	}
-	//////////////////////////////////////////////// Input
-	// Read image1
-	float *iarr1;
-	size_t w1, h1;
-	if (NULL == (iarr1 = read_img_f32_gray(argv[1], &w1, &h1))) {
-		std::cerr << "Unable to load image file " << argv[1] << std::endl;
-		return 1;
-	}
-	std::vector < float >ipixels1(iarr1, iarr1 + w1 * h1);
-	free(iarr1);		/*memcheck */
 
-	///// Resize the images to area wS*hW in remaining the apsect-ratio
-	///// Resize if the resize flag is not set or if the flag is set unequal to 0
-	float wS = IM_X;
-	float hS = IM_Y;
+	for (int argindex = 1; argindex < argc; argindex += 2) {
+		//////////////////////////////////////////////// Input
+		// Read image1
+		float *iarr1;
+		size_t w1, h1;
+		if (NULL == (iarr1 = read_img_f32_gray(argv[argindex], &w1, &h1))) {
+			std::cerr << "Unable to load image file " << argv[argindex] << std::endl;
+			return 1;
+		}
+		std::vector < float >ipixels1(iarr1, iarr1 + w1 * h1);
+		free(iarr1);	/*memcheck */
 
-	float zoom1 = 0;
-	int wS1 = 0, hS1 = 0;
-	vector < float >ipixels1_zoom;
+		///// Resize the images to area wS*hW in remaining the apsect-ratio
+		///// Resize if the resize flag is not set or if the flag is set unequal to 0
+		float wS = IM_X;
+		float hS = IM_Y;
 
-	cout << "WARNING: The input images are resized to " << wS << "x" << hS << " for ASIFT. " << endl
-	    << "         But the results will be normalized to the original image size." << endl << endl;
+		float zoom1 = 0;
+		int wS1 = 0, hS1 = 0;
+		vector < float >ipixels1_zoom;
 
-	float InitSigma_aa = 1.6;
+		cout << "WARNING: The input images are resized to " << wS << "x" << hS << " for ASIFT. " << endl
+		    << "         But the results will be normalized to the original image size." << endl << endl;
 
-	float fproj_p, fproj_bg;
-	char fproj_i;
-	float *fproj_x4, *fproj_y4;
-	int fproj_o;
+		float InitSigma_aa = 1.6;
 
-	fproj_o = 3;
-	fproj_p = 0;
-	fproj_i = 0;
-	fproj_bg = 0;
-	fproj_x4 = 0;
-	fproj_y4 = 0;
+		float fproj_p, fproj_bg;
+		char fproj_i;
+		float *fproj_x4, *fproj_y4;
+		int fproj_o;
 
-	float areaS = wS * hS;
+		fproj_o = 3;
+		fproj_p = 0;
+		fproj_i = 0;
+		fproj_bg = 0;
+		fproj_x4 = 0;
+		fproj_y4 = 0;
 
-	// Resize image 1
-	float area1 = w1 * h1;
-	zoom1 = sqrt(area1 / areaS);
+		float areaS = wS * hS;
 
-	wS1 = (int)(w1 / zoom1);
-	hS1 = (int)(h1 / zoom1);
+		// Resize image 1
+		float area1 = w1 * h1;
+		zoom1 = sqrt(area1 / areaS);
 
-	int fproj_sx = wS1;
-	int fproj_sy = hS1;
+		wS1 = (int)(w1 / zoom1);
+		hS1 = (int)(h1 / zoom1);
 
-	float fproj_x1 = 0;
-	float fproj_y1 = 0;
-	float fproj_x2 = wS1;
-	float fproj_y2 = 0;
-	float fproj_x3 = 0;
-	float fproj_y3 = hS1;
+		int fproj_sx = wS1;
+		int fproj_sy = hS1;
 
-	/* Anti-aliasing filtering along vertical direction */
-	if (zoom1 > 1) {
-		float sigma_aa = InitSigma_aa * zoom1 / 2;
-		GaussianBlur1D(ipixels1, w1, h1, sigma_aa, 1);
-		GaussianBlur1D(ipixels1, w1, h1, sigma_aa, 0);
-	}
-	// simulate a tilt: subsample the image along the vertical axis by a factor of t.
-	ipixels1_zoom.resize(wS1 * hS1);
-	fproj(ipixels1, ipixels1_zoom, w1, h1, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o, &fproj_p,
-	      &fproj_i, fproj_x1, fproj_y1, fproj_x2, fproj_y2, fproj_x3, fproj_y3, fproj_x4, fproj_y4);
+		float fproj_x1 = 0;
+		float fproj_y1 = 0;
+		float fproj_x2 = wS1;
+		float fproj_y2 = 0;
+		float fproj_x3 = 0;
+		float fproj_y3 = hS1;
 
-	///// Compute ASIFT keypoints
-	// number N of tilts to simulate t = 1, \sqrt{2}, (\sqrt{2})^2, ..., {\sqrt{2}}^(N-1)
-	int num_of_tilts1 = 7;
-	int verb = 0;
-	// Define the SIFT parameters
-	siftPar siftparameters;
-	default_sift_parameters(siftparameters);
+		/* Anti-aliasing filtering along vertical direction */
+		if (zoom1 > 1) {
+			float sigma_aa = InitSigma_aa * zoom1 / 2;
+			GaussianBlur1D(ipixels1, w1, h1, sigma_aa, 1);
+			GaussianBlur1D(ipixels1, w1, h1, sigma_aa, 0);
+		}
+		// simulate a tilt: subsample the image along the vertical axis by a factor of t.
+		ipixels1_zoom.resize(wS1 * hS1);
+		fproj(ipixels1, ipixels1_zoom, w1, h1, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o, &fproj_p,
+		      &fproj_i, fproj_x1, fproj_y1, fproj_x2, fproj_y2, fproj_x3, fproj_y3, fproj_x4, fproj_y4);
 
-	vector < vector < keypointslist > >keys1;
+		///// Compute ASIFT keypoints
+		// number N of tilts to simulate t = 1, \sqrt{2}, (\sqrt{2})^2, ..., {\sqrt{2}}^(N-1)
+		int num_of_tilts1 = 7;
+		int verb = 0;
+		// Define the SIFT parameters
+		siftPar siftparameters;
+		default_sift_parameters(siftparameters);
 
-	int num_keys1 = 0;
+		vector < vector < keypointslist > >keys1;
 
-	cout << "Computing keypoints on the image..." << endl;
-	time_t tstart, tend;
-	tstart = time(0);
+		int num_keys1 = 0;
 
-	num_keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, num_of_tilts1, verb, keys1, siftparameters);
+		cout << "Computing keypoints on the image..." << endl;
+		time_t tstart, tend;
+		tstart = time(0);
 
-	tend = time(0);
-	cout << "Keypoints computation accomplished in " << difftime(tend, tstart) << " seconds." << endl;
+		num_keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, num_of_tilts1, verb, keys1, siftparameters);
 
-	// Write all the keypoints (row, col, scale, orientation, desciptor (128 integers)) to
-	// the file argv[6] (so that the users can match the keypoints with their own matching algorithm if they wish to)
-	// keypoints in the 1st image
-	std::ofstream file_key1(argv[2]);
-	if (file_key1.is_open()) {
-		file_key1 << std::setw(10);
-		// Follow the same convention of David Lowe:
-		// the first line contains the number of keypoints and the length of the desciptors (128)
-		file_key1 << std::setw(10) << num_keys1 << ' ';
-		file_key1 << std::setw(10) << VecLength << std::endl;
-		for (int tt = 0; tt < (int)keys1.size(); tt++) {
-			for (int rr = 0; rr < (int)keys1[tt].size(); rr++) {
-				keypointslist::iterator ptr = keys1[tt][rr].begin();
-				for (int i = 0; i < (int)keys1[tt][rr].size(); i++, ptr++) {
-					file_key1 << std::setw(10) << zoom1 * ptr->x << ' ';
-					file_key1 << std::setw(10) << zoom1 * ptr->y << ' ';
-					file_key1 << std::setw(10) << zoom1 * ptr->scale << ' ';
-					file_key1 << std::setw(10) << ptr->angle;
+		tend = time(0);
+		cout << "Keypoints computation accomplished in " << difftime(tend, tstart) << " seconds." << endl;
 
-					for (int ii = 0; ii < (int)VecLength; ii++) {
-						file_key1 << ' ' << std::setw(10) << ptr->vec[ii];
+		// Write all the keypoints (row, col, scale, orientation, desciptor (128 integers)) to
+		// the file argv[6] (so that the users can match the keypoints with their own matching algorithm if they wish to)
+		// keypoints in the 1st image
+		std::ofstream file_key1(argv[argindex + 1]);
+		if (file_key1.is_open()) {
+
+			file_key1 << std::setw(10);
+			// Follow the same convention of David Lowe:
+			// the first line contains the number of keypoints and the length of the desciptors (128)
+			file_key1 << std::setw(10) << num_keys1 << ' ';
+			file_key1 << std::setw(10) << VecLength << std::endl;
+			for (int tt = 0; tt < (int)keys1.size(); tt++) {
+				for (int rr = 0; rr < (int)keys1[tt].size(); rr++) {
+					keypointslist::iterator ptr = keys1[tt][rr].begin();
+					for (int i = 0; i < (int)keys1[tt][rr].size(); i++, ptr++) {
+						file_key1 << std::setw(10) << zoom1 * ptr->x << ' ';
+						file_key1 << std::setw(10) << zoom1 * ptr->y << ' ';
+						file_key1 << std::setw(10) << zoom1 * ptr->scale << ' ';
+						file_key1 << std::setw(10) << ptr->angle;
+
+						for (int ii = 0; ii < (int)VecLength; ii++) {
+							file_key1 << ' ' << std::setw(10) << ptr->vec[ii];
+						}
+
+						file_key1 << std::endl;
 					}
-
-					file_key1 << std::endl;
 				}
 			}
+		} else {
+			std::cerr << "Unable to open the file keys.";
 		}
-	} else {
-		std::cerr << "Unable to open the file keys.";
-	}
 
-	file_key1.close();
+		file_key1.close();
+	}
 
 	return 0;
 }

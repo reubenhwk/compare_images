@@ -36,7 +36,7 @@
 // Reference: J.M. Morel and G.Yu, ASIFT: A New Framework for Fully Affine Invariant Image
 //            Comparison, SIAM Journal on Imaging Sciences, vol. 2, issue 2, pp. 438-469, 2009.
 // Reference: ASIFT online demo (You can try ASIFT with your own images online.)
-//			  http://www.ipol.im/pub/algo/my_affine_sift/
+//                        http://www.ipol.im/pub/algo/my_affine_sift/
 /*---------------------------------------------------------------------------*/
 
 #include "library.h"
@@ -46,6 +46,6 @@
 #include <vector>
 using namespace std;
 
-
-int compute_asift_matches(int num_of_tilts1, int num_of_tilts2, int w1, int h1, int w2, int h2, int verb, vector< vector< keypointslist > >& keys1, vector< vector< keypointslist > >& keys2, matchingslist &matchings, siftPar &siftparameters);
-
+int compute_asift_matches(int num_of_tilts1, int num_of_tilts2, int w1, int h1, int w2, int h2, int verb,
+			  vector < vector < keypointslist > >&keys1, vector < vector < keypointslist > >&keys2,
+			  matchingslist & matchings, siftPar & siftparameters);

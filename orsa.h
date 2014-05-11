@@ -2,7 +2,7 @@
 // C++ Implementation: stereomatch
 //
 // Description: eliminate the false matches with epipolar geometry constraint.
-//		See http://www.math-info.univ-paris5.fr/~moisan/epipolar/
+//              See http://www.math-info.univ-paris5.fr/~moisan/epipolar/
 //
 // Copyright (c) 2007 Lionel Moisan <Lionel.Moisan@parisdescartes.fr>
 // Changelog : 2011 Use Eigen SVD <Pierre Moulon>
@@ -52,26 +52,24 @@ float logcombi(int k, int n);
 /* tabulate logcombi(.,n) */
 float *makelogcombi_n(int n);
 
-
 /* tabulate logcombi(k,.) */
 float *makelogcombi_k(int k, int nmax);
-
 
 /* get a (sorted) random 7-uple of 0..n-1 */
 void random_p7(int *k, int n);
 
 /*-------------------- END OF GENERAL PURPOSE ROUTINES --------------------*/
 
-
 /* float comparison for qsort() */
 //According to http://www.cplusplus.com/reference/clibrary/cstdlib/qsort/,
 //we should have: void qsort ( void * base, size_t num, size_t size, int ( * comparator ) ( const void *, const void * ) ); that means, for "qsort", the "comparator" has two constant void* type input parameters
 int compf(const void *i, const void *j);
 
-void matcherrorn(float **F, const std::vector<float>& p1, const std::vector<float>& p2, float *e);
+void matcherrorn(float **F, const std::vector < float >&p1, const std::vector < float >&p2, float *e);
 
-int epipolar(std::vector<float>& m1, std::vector<float>& m2, int *k, float *z, float **F1, float **F2);
+int epipolar(std::vector < float >&m1, std::vector < float >&m2, int *k, float *z, float **F1, float **F2);
 
-float orsa(int width, int height, std::vector<Match>& match, std::vector<float>& index, int t_value, int verb_value, int n_flag_value, int mode_value, int stop_value);
+float orsa(int width, int height, std::vector < Match > &match, std::vector < float >&index, int t_value, int verb_value,
+	   int n_flag_value, int mode_value, int stop_value);
 
 #endif

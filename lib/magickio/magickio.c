@@ -1,5 +1,4 @@
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,11 +14,12 @@
 float *read_img_f32_gray(const char *fname, size_t * nx, size_t * ny)
 {
 
-	ExceptionInfo * exception = AcquireExceptionInfo();
-	ImageInfo * image_info = CloneImageInfo((ImageInfo *) NULL);
-	unsigned char * file_data = 0;
+	ExceptionInfo *exception = AcquireExceptionInfo();
+	ImageInfo *image_info = CloneImageInfo((ImageInfo *) NULL);
+	unsigned char *file_data = 0;
 	size_t file_data_size = read_file(&file_data, fname);
-	Image * image = BlobToImage(image_info, file_data, file_data_size, exception);
+	Image *image =
+	    BlobToImage(image_info, file_data, file_data_size, exception);
 
 	if (exception->severity != UndefinedException)
 		CatchException(exception);
@@ -31,15 +31,18 @@ float *read_img_f32_gray(const char *fname, size_t * nx, size_t * ny)
 	if (file_data)
 		free(file_data);
 
-	unsigned char * rgb = malloc(3 * image->magick_columns * image->magick_rows);
-	ExportImagePixels(image, 0, 0, image->magick_columns, image->magick_rows, "RGB", CharPixel, rgb, exception);
+	unsigned char *rgb =
+	    malloc(3 * image->magick_columns * image->magick_rows);
+	ExportImagePixels(image, 0, 0, image->magick_columns,
+			  image->magick_rows, "RGB", CharPixel, rgb, exception);
 
-	float * retval = malloc(sizeof(float) * image->magick_columns * image->magick_rows);
-	#pragma omp parallel for
+	float *retval =
+	    malloc(sizeof(float) * image->magick_columns * image->magick_rows);
+#pragma omp parallel for
 	for (size_t i = 0; i < image->magick_columns * image->magick_rows; ++i) {
-		retval[i] = (6969.0 * rgb[3*i+0]
-			+ 23434.0 * rgb[3*i+1]
-			+ 2365.0 * rgb[3*i+2]) / 32768.0;
+		retval[i] = (6969.0 * rgb[3 * i + 0]
+			     + 23434.0 * rgb[3 * i + 1]
+			     + 2365.0 * rgb[3 * i + 2]) / 32768.0;
 	}
 
 	if (exception->severity != UndefinedException)
@@ -54,4 +57,3 @@ float *read_img_f32_gray(const char *fname, size_t * nx, size_t * ny)
 
 	return retval;
 }
-

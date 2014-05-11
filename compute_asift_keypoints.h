@@ -36,9 +36,8 @@
 // Reference: J.M. Morel and G.Yu, ASIFT: A New Framework for Fully Affine Invariant Image
 //            Comparison, SIAM Journal on Imaging Sciences, vol. 2, issue 2, pp. 438-469, 2009.
 // Reference: ASIFT online demo (You can try ASIFT with your own images online.)
-//			  http://www.ipol.im/pub/algo/my_affine_sift/
+//                        http://www.ipol.im/pub/algo/my_affine_sift/
 /*---------------------------------------------------------------------------*/
-
 
 #include "library.h"
 #include "demo_lib_sift.h"
@@ -47,7 +46,7 @@
 #include <vector>
 using namespace std;
 
+int compute_asift_keypoints(vector < float >&image, int width, int height, int num_of_tilts, int verb,
+			    vector < vector < keypointslist > >&keys_all, siftPar & siftparameters);
 
-int compute_asift_keypoints(vector<float>& image, int width, int height, int num_of_tilts, int verb, vector< vector< keypointslist > >& keys_all, siftPar &siftparameters);
-
-void GaussianBlur1D(vector<float>& image, int width, int height, float sigma, int flag_dir);
+void GaussianBlur1D(vector < float >&image, int width, int height, float sigma, int flag_dir);
