@@ -80,19 +80,12 @@ sums 5 multiplications at a time to allow the compiler to schedule
 operations better and avoid loop overhead.  This almost triples
 speed of previous version on a Pentium with gcc.
 */
-inline void ConvBufferFast(float *buffer, float *kernel, int rsize, int ksize)
+inline void ConvBufferFast(float *buffer, float const * const kernel, int rsize, int ksize)
 {
-	int i;
-	float *bp, *kp, *endkp;
-
-	for (i = 0; i < rsize; i++) {
+	for (int i = 0; i < rsize; ++i) {
 		buffer[i] = 0.0;
-		bp = &buffer[i];
-		kp = &kernel[0];
-		endkp = &kernel[ksize];
-
-		while (kp < endkp) {
-			buffer[i] += *bp++ * *kp++;
+		for (int j = 0; j < ksize; ++j) {
+			buffer[i] += buffer[i+j] * kernel[j];
 		}
 	}
 }
@@ -101,7 +94,7 @@ inline void ConvBufferFast(float *buffer, float *kernel, int rsize, int ksize)
 is designed to be as efficient as possible.  Pixels outside the
 image are set to the value of the closest image pixel.
 */
-void ConvHorizontal(vector < float >&image, int width, int height, float *kernel, int ksize)
+void ConvHorizontal(vector < float >&image, int width, int height, float const * const kernel, int ksize)
 {
 	int const rows = height;
 	int const cols = width;
@@ -128,7 +121,7 @@ void ConvHorizontal(vector < float >&image, int width, int height, float *kernel
 
 /* Same as ConvHorizontal, but apply to vertical columns of image.
 */
-void ConvVertical(vector < float >&image, int width, int height, float *kernel, int ksize)
+void ConvVertical(vector < float >&image, int width, int height, float const * const kernel, int ksize)
 {
 	int const rows = height;
 	int const cols = width;
