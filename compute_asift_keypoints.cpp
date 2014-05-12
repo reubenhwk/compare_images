@@ -328,7 +328,6 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 
 		// If tilt t = 1, do not simulate rotation.
 		if (t == 1) {
-			// copy the image from vector to array as compute_sift_keypoints uses only array.
 			compute_sift_keypoints(&image_tmp1[0], keys_all[tt - 1][0], width, height, siftparameters);
 
 		} else {
@@ -384,7 +383,6 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 					printf("Rotation theta = %.2f, Tilt t = %.2f. w=%d, h=%d, sigma_aa=%.2f, \n", theta,
 					       t, width_t, height_t, sigma_aa);
 				}
-
 
 				// compute SIFT keypoints on simulated image.
 				keypointslist keypoints;
