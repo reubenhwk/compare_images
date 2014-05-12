@@ -103,29 +103,26 @@ image are set to the value of the closest image pixel.
 */
 void ConvHorizontal(vector < float >&image, int width, int height, float *kernel, int ksize)
 {
-	int rows, cols, r, c, i, halfsize;
-	vector < float >buffer;
+	int const rows = height;
+	int const cols = width;
 
-	rows = height;
-	cols = width;
+	int const halfsize = ksize / 2;
 
-	halfsize = ksize / 2;
+#pragma omp parallel for
+	for (int r = 0; r < rows; r++) {
+		vector<float>buffer;
+		buffer.resize(ksize + cols);
 
-	buffer.resize(ksize + cols);
-	for (r = 0; r < rows; r++) {
 		/* Copy the row into buffer with pixels at ends replicated for
 		   half the mask size.  This avoids need to check for ends
 		   within inner loop. */
-		for (i = 0; i < halfsize; i++)
+		for (int i = 0; i < halfsize; i++) {
 			buffer[i] = image[r * cols];
-		for (i = 0; i < cols; i++)
-			buffer[halfsize + i] = image[r * cols + i];
-		for (i = 0; i < halfsize; i++)
 			buffer[halfsize + cols + i] = image[r * cols + cols - 1];
-
+		}
+		memcpy(&buffer[halfsize], &image[r * cols], sizeof(float) * cols);
 		ConvBufferFast(&buffer[0], kernel, cols, ksize);
-		for (c = 0; c < cols; c++)
-			image[r * cols + c] = buffer[c];
+		memcpy(&image[r * cols], &buffer[0], sizeof(float) * cols);
 	}
 }
 
@@ -133,26 +130,27 @@ void ConvHorizontal(vector < float >&image, int width, int height, float *kernel
 */
 void ConvVertical(vector < float >&image, int width, int height, float *kernel, int ksize)
 {
-	int rows, cols, r, c, i, halfsize;
-	vector < float >buffer;
+	int const rows = height;
+	int const cols = width;
+	int const halfsize = ksize / 2;
 
-	rows = height;
-	cols = width;
+#pragma omp parallel for
+	for (int c = 0; c < cols; c++) {
+		vector<float>buffer;
+		buffer.resize(ksize + rows);
 
-	halfsize = ksize / 2;
-
-	buffer.resize(ksize + rows);
-	for (c = 0; c < cols; c++) {
-		for (i = 0; i < halfsize; i++)
+		for (int i = 0; i < halfsize; i++) {
 			buffer[i] = image[c];
-		for (i = 0; i < rows; i++)
-			buffer[halfsize + i] = image[i * cols + c];
-		for (i = 0; i < halfsize; i++)
 			buffer[halfsize + rows + i] = image[(rows - 1) * cols + c];
+		}
+		for (int i = 0; i < rows; i++)
+			buffer[halfsize + i] = image[i * cols + c];
 
 		ConvBufferFast(&buffer[0], kernel, rows, ksize);
-		for (r = 0; r < rows; r++)
+
+		for (int r = 0; r < rows; r++) {
 			image[r * cols + c] = buffer[r];
+		}
 	}
 }
 
