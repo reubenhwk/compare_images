@@ -15,7 +15,7 @@ void bound(int x, int y, float ca, float sa, int *xmin, int *xmax, int *ymin, in
      float  *a,*b;
      char *k_flag; */
 
-void frot(vector < float >&in, vector < float >&out, int nx, int ny, int *nx_out, int *ny_out, float *a, float *b,
+void frot(vector < float > const &in, vector < float >&out, int nx, int ny, int *nx_out, int *ny_out, float *a, float *b,
 	  char *k_flag)
 //void frot(float *in, float *out, int nx, int ny, int *nx_out, int *ny_out, float *a, float *b, char *k_flag)
 {

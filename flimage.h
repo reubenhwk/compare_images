@@ -21,12 +21,12 @@ class flimage {
 	 flimage();
 	 flimage(int w, int h);
 	 flimage(int w, int h, float v);
-	 flimage(int w, int h, float *v);
+	 flimage(int w, int h, float const *v);
 	 flimage(const flimage & im);
 	 flimage & operator=(const flimage & im);
 
 	void create(int w, int h);
-	void create(int w, int h, float *v);
+	void create(int w, int h, float const *v);
 
 	//// Destruction
 	void erase();

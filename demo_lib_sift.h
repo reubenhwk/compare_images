@@ -224,7 +224,7 @@ struct siftPar {
 
 void default_sift_parameters(siftPar & par);
 
-void compute_sift_keypoints(float *input, keypointslist & keypoints, int width, int height, siftPar & par);
+void compute_sift_keypoints(float const *input, keypointslist & keypoints, int width, int height, siftPar & par);
 
 // MATCHING DETECTION FUNCTION:
 void compute_sift_matches(keypointslist & keys1, keypointslist & keys2, matchingslist & matchings, siftPar & par);

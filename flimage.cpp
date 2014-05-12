@@ -4,9 +4,11 @@
 
 #include "flimage.h"
 
+#include <string.h>
+
 //////////////////////////////////////////////// Class flimage
 //// Construction
- flimage::flimage():width(0), height(0), p(0)
+flimage::flimage():width(0), height(0), p(0)
 {
 }
 
@@ -22,10 +24,9 @@ flimage::flimage(int w, int h, float v):width(w), height(h), p(new float[w * h])
 		p[j] = v;
 }
 
-flimage::flimage(int w, int h, float *v):width(w), height(h), p(new float[w * h])
+flimage::flimage(int w, int h, float const *v):width(w), height(h), p(new float[w * h])
 {
-	for (int j = width * height - 1; j >= 0; j--)
-		p[j] = v[j];
+	memcpy(p, v, sizeof(float) * w * h);
 }
 
 void flimage::create(int w, int h)
@@ -34,24 +35,21 @@ void flimage::create(int w, int h)
 	width = w;
 	height = h;
 	p = new float[w * h];
-	for (int j = width * height - 1; j >= 0; j--)
-		p[j] = 0.0;
+	memset(p, 0, sizeof(float) * w * h);
 }
 
-void flimage::create(int w, int h, float *v)
+void flimage::create(int w, int h, float const *v)
 {
 	erase();
 	width = w;
 	height = h;
 	p = new float[w * h];
-	for (int j = width * height - 1; j >= 0; j--)
-		p[j] = v[j];
+	memcpy(p, v, sizeof(float) * w * h);
 }
 
 flimage::flimage(const flimage & im):width(im.width), height(im.height), p(new float[im.width * im.height])
 {
-	for (int j = width * height - 1; j >= 0; j--)
-		p[j] = im.p[j];
+	memcpy(p, im.p, sizeof(float) * width * height);
 }
 
 flimage & flimage::operator=(const flimage & im)
@@ -67,8 +65,8 @@ flimage & flimage::operator=(const flimage & im)
 		p = new float[width * height];
 	}
 
-	for (int j = width * height - 1; j >= 0; j--)
-		p[j] = im.p[j];
+	memcpy(p, im.p, sizeof(float) * width * height);
+
 	return *this;
 }
 

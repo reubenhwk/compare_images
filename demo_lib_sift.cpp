@@ -115,7 +115,7 @@ inline void AddSample(float index[IndexSize][IndexSize][OriSize], keypoint & key
 inline void PlaceInIndex(float index[IndexSize][IndexSize][OriSize],
 			 float mag, float ori, float rx, float cx, siftPar & par);
 
-void compute_sift_keypoints(float *input, keypointslist & keypoints, int width, int height, siftPar & par)
+void compute_sift_keypoints(float const *input, keypointslist & keypoints, int width, int height, siftPar & par)
 {
 
 	flimage image;
