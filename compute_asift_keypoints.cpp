@@ -69,7 +69,7 @@ a value of about 3.0, at which point the Gaussian has fallen to
 only 1% of its central value.  A value of 2.0 greatly reduces
 keypoint consistency, and a value of 4.0 is better than 3.0.
 */
-const float GaussTruncate1 = 4.0;
+static const float GaussTruncate1 = 4.0;
 
 /* --------------------------- Blur image --------------------------- */
 
@@ -80,7 +80,7 @@ sums 5 multiplications at a time to allow the compiler to schedule
 operations better and avoid loop overhead.  This almost triples
 speed of previous version on a Pentium with gcc.
 */
-inline void ConvBufferFast(float *buffer, float const * const kernel, int rsize, int ksize)
+static inline void ConvBufferFast(float *buffer, float const * const kernel, int rsize, int ksize)
 {
 	for (int i = 0; i < rsize; ++i) {
 		buffer[i] = 0.0;
@@ -94,7 +94,7 @@ inline void ConvBufferFast(float *buffer, float const * const kernel, int rsize,
 is designed to be as efficient as possible.  Pixels outside the
 image are set to the value of the closest image pixel.
 */
-void ConvHorizontal(vector < float >&image, int width, int height, float const * const kernel, int ksize)
+static void ConvHorizontal(vector < float >&image, int width, int height, float const * const kernel, int ksize)
 {
 	int const rows = height;
 	int const cols = width;
@@ -121,7 +121,7 @@ void ConvHorizontal(vector < float >&image, int width, int height, float const *
 
 /* Same as ConvHorizontal, but apply to vertical columns of image.
 */
-void ConvVertical(vector < float >&image, int width, int height, float const * const kernel, int ksize)
+static void ConvVertical(vector < float >&image, int width, int height, float const * const kernel, int ksize)
 {
 	int const rows = height;
 	int const cols = width;
