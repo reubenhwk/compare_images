@@ -464,13 +464,15 @@ void compute_gradient_orientation(float *igray, float *grad, float *ori, int wid
 
 void sample(float *igray, float *ogray, float factor, int width, int height)
 {
+	int const swidth = (int)((float)width / factor);
+	int const sheight = (int)((float)height / factor);
 
-	int swidth = (int)((float)width / factor);
-	int sheight = (int)((float)height / factor);
-
-	for (int j = 0; j < sheight; j++)
-		for (int i = 0; i < swidth; i++)
-			ogray[j * swidth + i] = igray[(int)((float)j * factor) * width + (int)((float)i * factor)];
+	for (int j = 0; j < sheight; j++) {
+		int x = (int)((float)j * factor) * width;
+		for (int i = 0; i < swidth; i++) {
+			ogray[j * swidth + i] = igray[(int)(x + i * factor)];
+		}
+	}
 
 }
 

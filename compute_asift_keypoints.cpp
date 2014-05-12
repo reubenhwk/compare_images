@@ -250,7 +250,7 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 	vector < float >image_t, image_tmp1, image_tmp;
 
 	float t_min, t_k;
-	int num_tilt, tt, num_rot_t2, rr;
+	int num_tilt, num_rot_t2;
 	int fproj_o;
 	float fproj_p, fproj_bg;
 	char fproj_i;
@@ -262,7 +262,6 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 	int flag_dir = 1;
 	float BorderFact = 6 * sqrt(2.);
 
-	int num_keys_total = 0;
 
 	fproj_o = 3;
 	fproj_p = 0;
@@ -289,7 +288,8 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 
 	/* Calculate the number of simulations, and initialize keys_all */
 	keys_all = std::vector < vector < keypointslist > >(num_tilt);
-	for (tt = 1; tt <= num_tilt; tt++) {
+#pragma omp parallel for
+	for (int tt = 1; tt <= num_tilt; tt++) {
 		float t = t_min * pow(t_k, tt - 1);
 
 		if (t == 1) {
@@ -321,8 +321,8 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 #ifdef _OPENMP
 	omp_set_nested(1);
 #endif
-#pragma omp parallel for private(tt)
-	for (tt = 1; tt <= num_tilt; tt++) {
+#pragma omp parallel for
+	for (int tt = 1; tt <= num_tilt; tt++) {
 		float t = t_min * pow(t_k, tt - 1);
 
 		float t1 = 1;
@@ -331,13 +331,7 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 		// If tilt t = 1, do not simulate rotation.
 		if (t == 1) {
 			// copy the image from vector to array as compute_sift_keypoints uses only array.
-			float *image_tmp1_float = new float[width * height];
-			for (int cc = 0; cc < width * height; cc++)
-				image_tmp1_float[cc] = image_tmp1[cc];
-
-			compute_sift_keypoints(image_tmp1_float, keys_all[tt - 1][0], width, height, siftparameters);
-
-			delete[]image_tmp1_float;
+			compute_sift_keypoints(&image_tmp1[0], keys_all[tt - 1][0], width, height, siftparameters);
 
 		} else {
 			// The number of rotations to simulate under the current tilt.
@@ -350,7 +344,7 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 			float delta_theta = PI / num_rot1;
 
 			// Loop on rotations.
-#pragma omp parallel for private(rr)
+#pragma omp parallel for
 			for (int rr = 1; rr <= num_rot1; rr++) {
 				float theta = delta_theta * (rr - 1);
 				theta = theta * 180 / PI;
@@ -393,16 +387,11 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 					       t, width_t, height_t, sigma_aa);
 				}
 
-				float *image_tmp1_float = new float[width_t * height_t];
-				for (int cc = 0; cc < width_t * height_t; cc++)
-					image_tmp1_float[cc] = image_tmp1[cc];
 
 				// compute SIFT keypoints on simulated image.
 				keypointslist keypoints;
 				keypointslist keypoints_filtered;
-				compute_sift_keypoints(image_tmp1_float, keypoints, width_t, height_t, siftparameters);
-
-				delete[]image_tmp1_float;
+				compute_sift_keypoints(&image_tmp1[0], keypoints, width_t, height_t, siftparameters);
 
 				/* check if the keypoint is located on the boundary of the parallelogram (i.e., the boundary of the distorted input image). If so, remove it to avoid boundary artifacts. */
 				if (keypoints.size() != 0) {
@@ -501,13 +490,15 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 		}
 	}
 
-	{
-		for (tt = 0; tt < (int)keys_all.size(); tt++)
-			for (rr = 0; rr < (int)keys_all[tt].size(); rr++) {
-				num_keys_total += (int)keys_all[tt][rr].size();
-			}
-		printf("%d ASIFT keypoints are detected. \n", num_keys_total);
+
+	int num_keys_total = 0;
+#pragma omp parallel for reduction(+:num_keys_total)
+	for (int tt = 0; tt < (int)keys_all.size(); tt++) {
+		for (int rr = 0; rr < (int)keys_all[tt].size(); rr++) {
+			num_keys_total += (int)keys_all[tt][rr].size();
+		}
 	}
+	printf("%d ASIFT keypoints are detected. \n", num_keys_total);
 
 	return num_keys_total;
 }
