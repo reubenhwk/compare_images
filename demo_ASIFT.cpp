@@ -61,6 +61,7 @@ using namespace std;
 #include "compute_asift_matches.h"
 
 #include "image_size.h"
+#include "keyio.h"
 
 int main(int argc, char **argv)
 {
@@ -324,24 +325,7 @@ int main(int argc, char **argv)
 	// keypoints in the 1st image
 	std::ofstream file_key1(argv[6]);
 	if (file_key1.is_open()) {
-		// Follow the same convention of David Lowe:
-		// the first line contains the number of keypoints and the length of the desciptors (128)
-		file_key1 << num_keys1 << "  " << VecLength << "  " << std::endl;
-		for (int tt = 0; tt < (int)keys1.size(); tt++) {
-			for (int rr = 0; rr < (int)keys1[tt].size(); rr++) {
-				keypointslist::iterator ptr = keys1[tt][rr].begin();
-				for (int i = 0; i < (int)keys1[tt][rr].size(); i++, ptr++) {
-					file_key1 << zoom1 * ptr->x << "  " << zoom1 * ptr->y << "  " << zoom1 *
-					    ptr->scale << "  " << ptr->angle;
-
-					for (int ii = 0; ii < (int)VecLength; ii++) {
-						file_key1 << "  " << ptr->vec[ii];
-					}
-
-					file_key1 << std::endl;
-				}
-			}
-		}
+		stream_keys_out(file_key1, num_keys1, zoom1, keys1);
 	} else {
 		std::cerr << "Unable to open the file keys1.";
 	}
@@ -351,23 +335,7 @@ int main(int argc, char **argv)
 	////// keypoints in the 2nd image
 	std::ofstream file_key2(argv[7]);
 	if (file_key2.is_open()) {
-		// Follow the same convention of David Lowe:
-		// the first line contains the number of keypoints and the length of the desciptors (128)
-		file_key2 << num_keys2 << "  " << VecLength << "  " << std::endl;
-		for (int tt = 0; tt < (int)keys2.size(); tt++) {
-			for (int rr = 0; rr < (int)keys2[tt].size(); rr++) {
-				keypointslist::iterator ptr = keys2[tt][rr].begin();
-				for (int i = 0; i < (int)keys2[tt][rr].size(); i++, ptr++) {
-					file_key2 << zoom2 * ptr->x << "  " << zoom2 * ptr->y << "  " << zoom2 *
-					    ptr->scale << "  " << ptr->angle;
-
-					for (int ii = 0; ii < (int)VecLength; ii++) {
-						file_key2 << "  " << ptr->vec[ii];
-					}
-					file_key2 << std::endl;
-				}
-			}
-		}
+		stream_keys_out(file_key2, num_keys2, zoom2, keys2);
 	} else {
 		std::cerr << "Unable to open the file keys2.";
 	}

@@ -41,6 +41,8 @@ extract_keys_SOURCES = \
 	frot.cpp \
 	frot.h \
 	image_size.h \
+	keyio.cpp \
+	keyio.h \
 	library.cpp \
 	library.h \
 	numerics1.cpp \
@@ -77,6 +79,8 @@ demo_ASIFT_SOURCES = \
 	frot.cpp \
 	frot.h \
 	image_size.h \
+	keyio.cpp \
+	keyio.h \
 	library.cpp \
 	library.h \
 	numerics1.cpp \
