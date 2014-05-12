@@ -231,8 +231,6 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 //
 // Output: the number of keypoints
 {
-	vector < float >image_t, image_tmp1, image_tmp;
-
 	float t_min, t_k;
 	int num_tilt, num_rot_t2;
 	int fproj_o;
@@ -267,8 +265,6 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 		printf("Number of tilts num_tilt should be equal or larger than 1. \n");
 		exit(-1);
 	}
-
-	image_tmp1 = image;
 
 	/* Calculate the number of simulations, and initialize keys_all */
 	keys_all = std::vector < vector < keypointslist > >(num_tilt);
@@ -314,7 +310,7 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 
 		// If tilt t = 1, do not simulate rotation.
 		if (t == 1) {
-			compute_sift_keypoints(&image_tmp1[0], keys_all[tt - 1][0], width, height, siftparameters);
+			compute_sift_keypoints(&image[0], keys_all[tt - 1][0], width, height, siftparameters);
 
 		} else {
 			// The number of rotations to simulate under the current tilt.
@@ -332,11 +328,11 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 				float theta = delta_theta * (rr - 1);
 				theta = theta * 180 / PI;
 
-				vector < float >image_t;
+				vector < float >image_rot;
 				int width_r, height_r;
 
 				// simulate a rotation: rotate the image with an angle theta. (the outside of the rotated image are padded with the value frot_b)
-				frot(image, image_t, width, height, &width_r, &height_r, &theta, &frot_b, frot_k);
+				frot(image, image_rot, width, height, &width_r, &height_r, &theta, &frot_b, frot_k);
 
 				/* Tilt */
 				int width_t = (int)(width_r * t1);
@@ -355,15 +351,13 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 				/* Anti-aliasing filtering along vertical direction */
 				/* sigma_aa = InitSigma_aa * log2(t); */
 				float sigma_aa = InitSigma_aa * t / 2;
-				GaussianBlur1D(image_t, width_r, height_r, sigma_aa, flag_dir);
+				GaussianBlur1D(image_rot, width_r, height_r, sigma_aa, flag_dir);
 
 				// simulate a tilt: subsample the image along the vertical axis by a factor of t.
-				vector < float >image_tmp(width_t * height_t);
-				fproj(image_t, image_tmp, width_r, height_r, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o,
+				vector < float >image_tilt(width_t * height_t);
+				fproj(image_rot, image_tilt, width_r, height_r, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o,
 				      &fproj_p, &fproj_i, fproj_x1, fproj_y1, fproj_x2, fproj_y2, fproj_x3, fproj_y3,
 				      fproj_x4, fproj_y4);
-
-				vector < float >image_tmp1 = image_tmp;
 
 				if (verb) {
 					printf("Rotation theta = %.2f, Tilt t = %.2f. w=%d, h=%d, sigma_aa=%.2f, \n", theta,
@@ -372,7 +366,7 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 
 				// compute SIFT keypoints_unfiltered on simulated image.
 				keypointslist keypoints_unfiltered;
-				compute_sift_keypoints(&image_tmp1[0], keypoints_unfiltered, width_t, height_t, siftparameters);
+				compute_sift_keypoints(&image_tilt[0], keypoints_unfiltered, width_t, height_t, siftparameters);
 
 				/* check if the keypoint is located on the boundary of the parallelogram (i.e., the boundary of the distorted input image). If so, remove it to avoid boundary artifacts. */
 				if (keypoints_unfiltered.size() != 0) {
