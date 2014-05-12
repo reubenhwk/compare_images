@@ -183,26 +183,24 @@ void GaussianBlur1D(vector < float >&image, int width, int height, float sigma, 
 	}
 }
 
-void compensate_affine_coor1(float *x0, float *y0, int w1, int h1, float t1, float t2, float Rtheta)
+static inline void compensate_affine_coor1(float *x0, float *y0, int w1, int h1, float t1, float t2, float Rtheta)
 {
 	float x_ori, y_ori;
-	float x_tmp, y_tmp;
 
 	float x1 = *x0;
 	float y1 = *y0;
 
-	Rtheta = Rtheta * PI / 180;
+	Rtheta = Rtheta * PI / 180.0f;
+	float const sin_Rtheta = sin(Rtheta);
+	float const cos_Rtheta = cos(Rtheta);
 
-	if (Rtheta <= PI / 2) {
-		x_ori = 0;
-		y_ori = w1 * sin(Rtheta) / t1;
+	if (Rtheta <= PI / 2.0f) {
+		x_ori = 0.0f;
+		y_ori = w1 * sin_Rtheta / t1;
 	} else {
-		x_ori = -w1 * cos(Rtheta) / t2;
-		y_ori = (w1 * sin(Rtheta) + h1 * sin(Rtheta - PI / 2)) / t1;
+		x_ori = -w1 * cos_Rtheta / t2;
+		y_ori = (w1 * sin_Rtheta + h1 * sin(Rtheta - PI / 2.0f)) / t1;
 	}
-
-	float sin_Rtheta = sin(Rtheta);
-	float cos_Rtheta = cos(Rtheta);
 
 	/* project the coordinates of im1 to original image before tilt-rotation transform */
 	/* Get the coordinates with respect to the 'origin' of the original image before transform */
@@ -212,13 +210,8 @@ void compensate_affine_coor1(float *x0, float *y0, int w1, int h1, float t1, flo
 	x1 = x1 * t2;
 	y1 = y1 * t1;
 	/* Invert rotation (Note that the y direction (vertical) is inverse to the usual concention. Hence Rtheta instead of -Rtheta to inverse the rotation.) */
-	x_tmp = cos_Rtheta * x1 - sin_Rtheta * y1;
-	y_tmp = sin_Rtheta * x1 + cos_Rtheta * y1;
-	x1 = x_tmp;
-	y1 = y_tmp;
-
-	*x0 = x1;
-	*y0 = y1;
+	*x0 = cos_Rtheta * x1 - sin_Rtheta * y1;
+	*y0 = sin_Rtheta * x1 + cos_Rtheta * y1;
 }
 
 /* -------------- MAIN FUNCTION ---------------------- */
