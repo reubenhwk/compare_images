@@ -370,104 +370,104 @@ int compute_asift_keypoints(vector < float >&image, int width, int height, int n
 					       t, width_t, height_t, sigma_aa);
 				}
 
-				// compute SIFT keypoints on simulated image.
-				keypointslist keypoints;
-				keypointslist keypoints_filtered;
-				compute_sift_keypoints(&image_tmp1[0], keypoints, width_t, height_t, siftparameters);
+				// compute SIFT keypoints_unfiltered on simulated image.
+				keypointslist keypoints_unfiltered;
+				compute_sift_keypoints(&image_tmp1[0], keypoints_unfiltered, width_t, height_t, siftparameters);
 
 				/* check if the keypoint is located on the boundary of the parallelogram (i.e., the boundary of the distorted input image). If so, remove it to avoid boundary artifacts. */
-				if (keypoints.size() != 0) {
-					for (int cc = 0; cc < (int)keypoints.size(); cc++) {
+				if (keypoints_unfiltered.size() != 0) {
+					keypointslist keypoints_filtered;
+					for (int cc = 0; cc < (int)keypoints_unfiltered.size(); cc++) {
 
-						float x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, d1, d2, d3, d4, scale1, theta1,
-						    sin_theta1, cos_theta1, BorderTh;
+						float x[4];
+						float y[4];
 
-						x0 = keypoints[cc].x;
-						y0 = keypoints[cc].y;
-						scale1 = keypoints[cc].scale;
-
-						theta1 = theta * PI / 180;
-						sin_theta1 = sin(theta1);
-						cos_theta1 = cos(theta1);
+						float const theta1 = theta * PI / 180;
+						float const sin_theta1 = sin(theta1);
+						float const cos_theta1 = cos(theta1);
 
 						/* the coordinates of the 4 submits of the parallelogram */
 						if (theta <= 90) {
-							x1 = height * sin_theta1;
-							y1 = 0;
-							y2 = width * sin_theta1;
-							x3 = width * cos_theta1;
-							x4 = 0;
-							y4 = height * cos_theta1;
-							x2 = x1 + x3;
-							y3 = y2 + y4;
+							x[0] = height * sin_theta1;
+							y[0] = 0;
+							y[1] = width * sin_theta1;
+							x[2] = width * cos_theta1;
+							x[3] = 0;
+							y[3] = height * cos_theta1;
+							x[1] = x[0] + x[2];
+							y[2] = y[1] + y[3];
 
 							/* note that the vertical direction goes from top to bottom!!!
 							   The calculation above assumes that the vertical direction goes from the bottom to top. Thus the vertical coordinates need to be reversed!!! */
-							y1 = y3 - y1;
-							y2 = y3 - y2;
-							y4 = y3 - y4;
-							y3 = 0;
+							y[0] = y[2] - y[0];
+							y[1] = y[2] - y[1];
+							y[3] = y[2] - y[3];
+							y[2] = 0;
 
-							y1 = y1 * t2;
-							y2 = y2 * t2;
-							y3 = y3 * t2;
-							y4 = y4 * t2;
+							y[0] = y[0] * t2;
+							y[1] = y[1] * t2;
+							y[2] = y[2] * t2;
+							y[3] = y[3] * t2;
 						} else {
-							y1 = -height * cos_theta1;
-							x2 = height * sin_theta1;
-							x3 = 0;
-							y3 = width * sin_theta1;
-							x4 = -width * cos_theta1;
-							y4 = 0;
-							x1 = x2 + x4;
-							y2 = y1 + y3;
+							y[0] = -height * cos_theta1;
+							x[1] = height * sin_theta1;
+							x[2] = 0;
+							y[2] = width * sin_theta1;
+							x[3] = -width * cos_theta1;
+							y[3] = 0;
+							x[0] = x[1] + x[3];
+							y[1] = y[0] + y[2];
 
 							/* note that the vertical direction goes from top to bottom!!!
 							   The calculation above assumes that the vertical direction goes from the bottom to top. Thus the vertical coordinates need to be reversed!!! */
-							y1 = y2 - y1;
-							y3 = y2 - y3;
-							y4 = y2 - y4;
-							y2 = 0;
+							y[0] = y[1] - y[0];
+							y[2] = y[1] - y[2];
+							y[3] = y[1] - y[3];
+							y[1] = 0;
 
-							y1 = y1 * t2;
-							y2 = y2 * t2;
-							y3 = y3 * t2;
-							y4 = y4 * t2;
+							y[0] = y[0] * t2;
+							y[1] = y[1] * t2;
+							y[2] = y[2] * t2;
+							y[3] = y[3] * t2;
 						}
 
-						/* the distances from the keypoint to the 4 sides of the parallelogram */
-						d1 = ABS((x2 - x1) * (y1 - y0) -
-							 (x1 - x0) * (y2 - y1)) / sqrt((x2 - x1) * (x2 - x1) + (y2 -
-														y1) * (y2 -
-														       y1));
-						d2 = ABS((x3 - x2) * (y2 - y0) -
-							 (x2 - x0) * (y3 - y2)) / sqrt((x3 - x2) * (x3 - x2) + (y3 -
-														y2) * (y3 -
-														       y2));
-						d3 = ABS((x4 - x3) * (y3 - y0) -
-							 (x3 - x0) * (y4 - y3)) / sqrt((x4 - x3) * (x4 - x3) + (y4 -
-														y3) * (y4 -
-														       y3));
-						d4 = ABS((x1 - x4) * (y4 - y0) -
-							 (x4 - x0) * (y1 - y4)) / sqrt((x1 - x4) * (x1 - x4) + (y1 -
-														y4) * (y1 -
-														       y4));
+						float x0 = keypoints_unfiltered[cc].x;
+						float y0 = keypoints_unfiltered[cc].y;
 
-						BorderTh = BorderFact * scale1;
+						/* the distances from the keypoint to the 4 sides of the parallelogram */
+						float const d1 = ABS((x[1] - x[0]) * (y[0] - y0) -
+							 (x[0] - x0) * (y[1] - y[0])) / sqrt((x[1] - x[0]) * (x[1] - x[0]) + (y[1] -
+														y[0]) * (y[1] -
+														       y[0]));
+						float const d2 = ABS((x[2] - x[1]) * (y[1] - y0) -
+							 (x[1] - x0) * (y[2] - y[1])) / sqrt((x[2] - x[1]) * (x[2] - x[1]) + (y[2] -
+														y[1]) * (y[2] -
+														       y[1]));
+						float const d3 = ABS((x[3] - x[2]) * (y[2] - y0) -
+							 (x[2] - x0) * (y[3] - y[2])) / sqrt((x[3] - x[2]) * (x[3] - x[2]) + (y[3] -
+														y[2]) * (y[3] -
+														       y[2]));
+						float const d4 = ABS((x[0] - x[3]) * (y[3] - y0) -
+							 (x[3] - x0) * (y[0] - y[3])) / sqrt((x[0] - x[3]) * (x[0] - x[3]) + (y[0] -
+														y[3]) * (y[0] -
+														       y[3]));
+
+						float const scale1 = keypoints_unfiltered[cc].scale;
+						float const BorderTh = BorderFact * scale1;
 
 						if (!
 						    ((d1 < BorderTh) || (d2 < BorderTh) || (d3 < BorderTh)
 						     || (d4 < BorderTh))) {
 							// Normalize the coordinates of the matched points by compensate the simulate affine transformations
 							compensate_affine_coor1(&x0, &y0, width, height, 1 / t2, t1, theta);
-							keypoints[cc].x = x0;
-							keypoints[cc].y = y0;
+							keypoints_unfiltered[cc].x = x0;
+							keypoints_unfiltered[cc].y = y0;
 
-							keypoints_filtered.push_back(keypoints[cc]);
+							keypoints_filtered.push_back(keypoints_unfiltered[cc]);
 						}
 					}
+					keys_all[tt - 1][rr - 1] = keypoints_filtered;
 				}
-				keys_all[tt - 1][rr - 1] = keypoints_filtered;
 			}
 		}
 	}
