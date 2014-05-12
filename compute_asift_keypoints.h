@@ -39,6 +39,8 @@
 //                        http://www.ipol.im/pub/algo/my_affine_sift/
 /*---------------------------------------------------------------------------*/
 
+#pragma once
+
 #include "library.h"
 #include "demo_lib_sift.h"
 #include "frot.h"
