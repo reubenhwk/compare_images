@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 		// keypoints in the 1st image
 		std::ofstream file_key1(argv[argindex + 1]);
 		if (file_key1.is_open()) {
-			stream_keys_out(file_key1, keys1.count, zoom1, keys1.keys);
+			stream_keys_out(file_key1, keys1);
 		} else {
 			std::cerr << "Unable to open the file keys.";
 		}

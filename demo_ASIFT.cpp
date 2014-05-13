@@ -216,6 +216,29 @@ int main(int argc, char **argv)
 	KeyPoints keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, verb, siftparameters);
 	KeyPoints keys2 = compute_asift_keypoints(ipixels2_zoom, wS2, hS2, verb, siftparameters);
 
+	// Write all the keypoints (row, col, scale, orientation, desciptor (128 integers)) to
+	// the file argv[6] (so that the users can match the keypoints with their own matching algorithm if they wish to)
+	// keypoints in the 1st image
+	{
+		std::ofstream file_key1(argv[6]);
+		if (file_key1.is_open()) {
+			stream_keys_out(file_key1, keys1);
+		} else {
+			std::cerr << "Unable to open the file keys1 for writing." << std::endl;
+		}
+		file_key1.close();
+	}
+
+	////// keypoints in the 2nd image
+	{
+		std::ofstream file_key2(argv[7]);
+		if (file_key2.is_open()) {
+			stream_keys_out(file_key2, keys2);
+		} else {
+			std::cerr << "Unable to open the file keys2 for writing." << std::endl;
+		}
+		file_key2.close();
+	}
 	tend = time(0);
 	cout << "Keypoints computation accomplished in " << difftime(tend, tstart) << " seconds." << endl;
 
@@ -309,27 +332,6 @@ int main(int argc, char **argv)
 	}
 
 	file.close();
-
-	// Write all the keypoints (row, col, scale, orientation, desciptor (128 integers)) to
-	// the file argv[6] (so that the users can match the keypoints with their own matching algorithm if they wish to)
-	// keypoints in the 1st image
-	std::ofstream file_key1(argv[6]);
-	if (file_key1.is_open()) {
-		stream_keys_out(file_key1, keys1.count, zoom1, keys1.keys);
-	} else {
-		std::cerr << "Unable to open the file keys1.";
-	}
-
-	file_key1.close();
-
-	////// keypoints in the 2nd image
-	std::ofstream file_key2(argv[7]);
-	if (file_key2.is_open()) {
-		stream_keys_out(file_key2, keys2.count, zoom2, keys2.keys);
-	} else {
-		std::cerr << "Unable to open the file keys2.";
-	}
-	file_key2.close();
 
 	return 0;
 }
