@@ -16,5 +16,6 @@ missing
 *.o
 
 demo_ASIFT
-extract-keys
+extract_keys
+match_keys
 

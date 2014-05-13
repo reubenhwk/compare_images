@@ -8,13 +8,51 @@ libmagickio_a_CFLAGS = @MagickCore_CFLAGS@
 
 noinst_PROGRAMS = \
 	demo_ASIFT \
-	extract-keys
+	extract_keys \
+	match_keys
 
 noinst_LIBRARIES = \
 	libnumerics.a \
 	libmatch.a \
 	libio_png.a \
 	libmagickio.a
+
+match_keys_LDADD = \
+	libmagickio.a \
+	@MagickCore_LIBS@ \
+	libnumerics.a \
+	libmatch.a 
+
+match_keys_SOURCES = \
+	compute_asift_keypoints.cpp \
+	compute_asift_keypoints.h \
+	compute_asift_matches.cpp \
+	compute_asift_matches.h \
+	demo_lib_sift.cpp \
+	demo_lib_sift.h \
+	domain.cpp \
+	domain.h \
+	filter.cpp \
+	filter.h \
+	flimage.cpp \
+	flimage.h \
+	fproj.cpp \
+	fproj.h \
+	frot.cpp \
+	frot.h \
+	image_size.h \
+	keyio.cpp \
+	keyio.h \
+	library.cpp \
+	library.h \
+	match_keys.cpp \
+	numerics1.cpp \
+	numerics1.h \
+	orsa.cpp \
+	orsa.h \
+	splines.cpp \
+	splines.h
+
 
 extract_keys_LDADD = \
 	libmagickio.a \
@@ -25,8 +63,6 @@ extract_keys_LDADD = \
 extract_keys_SOURCES = \
 	compute_asift_keypoints.cpp \
 	compute_asift_keypoints.h \
-	compute_asift_matches.cpp \
-	compute_asift_matches.h \
 	demo_lib_sift.cpp \
 	demo_lib_sift.h \
 	domain.cpp \
