@@ -679,6 +679,7 @@ int compute_asift_matches(int num_of_tilts1, int num_of_tilts2, int w1, int h1, 
 
 				cout << "The two images match! " << matchings.
 				    size() << " matchings are identified. log(nfa)=" << nfa << "." << endl;
+				return 0;
 			} else {
 				matchings.clear();
 				Minfoall.clear();
@@ -694,6 +695,5 @@ int compute_asift_matches(int num_of_tilts1, int num_of_tilts2, int w1, int h1, 
 		cout << "The two images do not match.\n" << endl;
 	}
 
-	return matchings.size();
-
+	return -1;
 }

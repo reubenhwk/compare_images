@@ -89,7 +89,6 @@ int main(int argc, char **argv)
 	}
 
 	//// Match ASIFT keypoints
-	int num_matchings;
 	matchingslist matchings;
 	cout << "Matching the keypoints..." << endl;
 	time_t const tstart = time(0);
@@ -101,7 +100,7 @@ int main(int argc, char **argv)
 	float wS1, hS1, wS2, hS2;
 	wS1 = hS1 = wS2 = hS2 = 1;
 	
-	num_matchings = compute_asift_matches(keys[0].tilts, keys[1].tilts, 
+	int rc = compute_asift_matches(keys[0].tilts, keys[1].tilts, 
 						keys[0].width, keys[0].height,
 						keys[1].width, keys[1].height,
 						0,
@@ -110,5 +109,5 @@ int main(int argc, char **argv)
 	time_t const tend = time(0);
 	cout << "Keypoints matching accomplished in " << difftime(tend, tstart) << " seconds." << endl;
 
-	return 0;
+	return rc;
 }

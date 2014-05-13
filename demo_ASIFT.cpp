@@ -243,11 +243,10 @@ int main(int argc, char **argv)
 	cout << "Keypoints computation accomplished in " << difftime(tend, tstart) << " seconds." << endl;
 
 	//// Match ASIFT keypoints
-	int num_matchings;
 	matchingslist matchings;
 	cout << "Matching the keypoints..." << endl;
 	tstart = time(0);
-	num_matchings = compute_asift_matches(keys1.tilts, keys2.tilts, wS1, hS1, wS2,
+	compute_asift_matches(keys1.tilts, keys2.tilts, wS1, hS1, wS2,
 					      hS2, verb, keys1.keys, keys2.keys, matchings, siftparameters);
 	tend = time(0);
 	cout << "Keypoints matching accomplished in " << difftime(tend, tstart) << " seconds." << endl;
@@ -319,9 +318,6 @@ int main(int argc, char **argv)
 	////// Write the coordinates of the matched points (row1, col1, row2, col2) to the file argv[5]
 	std::ofstream file(argv[5]);
 	if (file.is_open()) {
-		// Write the number of matchings in the first line
-		file << num_matchings << std::endl;
-
 		matchingslist::iterator ptr = matchings.begin();
 		for (int i = 0; i < (int)matchings.size(); i++, ptr++) {
 			file << zoom1 * ptr->first.x << "  " << zoom1 * ptr->first.y << "  " << zoom2 * ptr->second.x <<
