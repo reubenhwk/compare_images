@@ -45,6 +45,8 @@ float *read_img_f32_gray(const char *fname, size_t * nx, size_t * ny)
 			     + 2365.0 * rgb[3 * i + 2]) / 32768.0;
 	}
 
+	free(rgb);
+
 	if (exception->severity != UndefinedException)
 		CatchException(exception);
 
