@@ -147,9 +147,6 @@ int main(int argc, char **argv)
 		fproj(ipixels1, ipixels1_zoom, w1, h1, &fproj_sx, &fproj_sy, &fproj_bg, &fproj_o, &fproj_p,
 		      &fproj_i, fproj_x1, fproj_y1, fproj_x2, fproj_y2, fproj_x3, fproj_y3, fproj_x4, fproj_y4);
 
-		///// Compute ASIFT keypoints
-		// number N of tilts to simulate t = 1, \sqrt{2}, (\sqrt{2})^2, ..., {\sqrt{2}}^(N-1)
-		int num_of_tilts1 = 7;
 		int verb = 0;
 		// Define the SIFT parameters
 		siftPar siftparameters;
@@ -159,7 +156,7 @@ int main(int argc, char **argv)
 		time_t tstart, tend;
 		tstart = time(0);
 
-		KeyPoints keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, num_of_tilts1, verb, siftparameters);
+		KeyPoints keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, verb, siftparameters);
 
 		tend = time(0);
 		cout << "Keypoints computation accomplished in " << difftime(tend, tstart) << " seconds." << endl;

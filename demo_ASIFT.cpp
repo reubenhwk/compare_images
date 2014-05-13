@@ -204,11 +204,6 @@ int main(int argc, char **argv)
 	}
 
 	///// Compute ASIFT keypoints
-	// number N of tilts to simulate t = 1, \sqrt{2}, (\sqrt{2})^2, ..., {\sqrt{2}}^(N-1)
-	int num_of_tilts1 = 7;
-	int num_of_tilts2 = 7;
-//      int num_of_tilts1 = 1;
-//      int num_of_tilts2 = 1;
 	int verb = 0;
 	// Define the SIFT parameters
 	siftPar siftparameters;
@@ -218,8 +213,8 @@ int main(int argc, char **argv)
 	time_t tstart, tend;
 	tstart = time(0);
 
-	KeyPoints keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, num_of_tilts1, verb, siftparameters);
-	KeyPoints keys2 = compute_asift_keypoints(ipixels2_zoom, wS2, hS2, num_of_tilts2, verb, siftparameters);
+	KeyPoints keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, verb, siftparameters);
+	KeyPoints keys2 = compute_asift_keypoints(ipixels2_zoom, wS2, hS2, verb, siftparameters);
 
 	tend = time(0);
 	cout << "Keypoints computation accomplished in " << difftime(tend, tstart) << " seconds." << endl;
@@ -229,7 +224,7 @@ int main(int argc, char **argv)
 	matchingslist matchings;
 	cout << "Matching the keypoints..." << endl;
 	tstart = time(0);
-	num_matchings = compute_asift_matches(num_of_tilts1, num_of_tilts2, wS1, hS1, wS2,
+	num_matchings = compute_asift_matches(keys1.tilts, keys2.tilts, wS1, hS1, wS2,
 					      hS2, verb, keys1.keys, keys2.keys, matchings, siftparameters);
 	tend = time(0);
 	cout << "Keypoints matching accomplished in " << difftime(tend, tstart) << " seconds." << endl;

@@ -88,6 +88,8 @@ typedef std::vector < keypoint > keypointslist;
 class KeyPoints {
 public:
 	vector < vector < keypointslist > >keys;
+	// number N of tilts to simulate t = 1, \sqrt{2}, (\sqrt{2})^2, ..., {\sqrt{2}}^(N-1)
+	size_t tilts;
 	size_t count;
 };
 

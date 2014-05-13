@@ -48,7 +48,7 @@
 #include <vector>
 using namespace std;
 
-KeyPoints compute_asift_keypoints(vector<float> const &image, int width, int height, int num_of_tilts, int verb,
+KeyPoints compute_asift_keypoints(vector<float> const &image, int width, int height, int verb,
 			    siftPar & siftparameters);
 
 void GaussianBlur1D(vector < float >&image, int width, int height, float sigma, int flag_dir);
