@@ -77,18 +77,18 @@ template < typename T > struct keypoint_template {
 	T vec[VecLength];
 };
 
-typedef keypoint_template < float >keypoint;
-typedef keypoint_template < unsigned int >keypoint_int;
-typedef keypoint_template < unsigned short >keypoint_short;
-typedef keypoint_template < unsigned char >keypoint_char;
+typedef keypoint_template<float> keypoint;
+typedef keypoint_template<unsigned int> keypoint_int;
+typedef keypoint_template<unsigned short> keypoint_short;
+typedef keypoint_template<unsigned char> keypoint_char;
 
 /* List of keypoints: just use the standard class vector: */
 typedef std::vector < keypoint > keypointslist;
 
 /* List of keypoints: just use the standard class vector: */
-typedef std::vector < keypoint_char > keypointslist_char;
-typedef std::vector < keypoint_short > keypointslist_short;
-typedef std::vector < keypoint_int > keypointslist_int;
+typedef std::vector<keypoint_char> keypointslist_char;
+typedef std::vector<keypoint_short> keypointslist_short;
+typedef std::vector<keypoint_int> keypointslist_int;
 
 /* Matching: just use the standard class pair: */
 typedef std::pair < keypoint, keypoint > matching;
