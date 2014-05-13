@@ -91,6 +91,8 @@ public:
 	// number N of tilts to simulate t = 1, \sqrt{2}, (\sqrt{2})^2, ..., {\sqrt{2}}^(N-1)
 	size_t tilts;
 	size_t count;
+	size_t width;
+	size_t height;
 };
 
 /* List of keypoints: just use the standard class vector: */

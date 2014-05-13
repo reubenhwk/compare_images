@@ -483,5 +483,7 @@ KeyPoints compute_asift_keypoints(vector < float > const &image, int width, int 
 	retval.keys = keys_all;
 	retval.tilts = num_of_tilts;
 	retval.count = num_keys_total;
+	retval.width = width;
+	retval.height = height;
 	return retval;
 }

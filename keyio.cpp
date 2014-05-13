@@ -19,8 +19,10 @@ void stream_keys_in(ifstream &file, KeyPoints &keys1)
 	int len;
 	file >> not_used >> len;
 
-	int tilts = 0;
+	file >> not_used >> keys1.width;
+	file >> not_used >> keys1.height;
 
+	int tilts = 0;
 	file >> not_used >> keys1.tilts;
 	keys1.keys.resize(keys1.tilts);
 	for (int tt = 0; tt < keys1.tilts; tt++) {
@@ -45,6 +47,7 @@ void stream_keys_in(ifstream &file, KeyPoints &keys1)
 			}
 		}
 	}
+	file >> not_used;
 }
 
 void stream_keys_out(ofstream &file, KeyPoints &keys1)
@@ -53,9 +56,9 @@ void stream_keys_out(ofstream &file, KeyPoints &keys1)
 	 * for the version number.  The fourth byte is always
 	 * for the newline. */
 	file << std::setw(10) << "version:" << ' ' << std::setw(10) << 1 << std::endl;
-
 	file << std::setw(10) << "length:" << ' ' << std::setw(10) << VecLength << std::endl;
-
+	file << std::setw(10) << "width:" << ' ' << std::setw(10) << keys1.width << std::endl;
+	file << std::setw(10) << "height:" << ' ' << std::setw(10) << keys1.height << std::endl;
 	file << std::setw(10) << "tilts:" << ' ' << std::setw(10) << (int)keys1.keys.size() << std::endl;
 	for (int tt = 0; tt < (int)keys1.keys.size(); tt++) {
 		file << std::setw(10) << "rotations:" << ' ' << std::setw(10) << (int)keys1.keys[tt].size() << std::endl;
@@ -76,5 +79,6 @@ void stream_keys_out(ofstream &file, KeyPoints &keys1)
 			}
 		}
 	}
+	file << "COMPLETE" << std::endl;
 }
 
