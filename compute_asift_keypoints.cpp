@@ -216,8 +216,8 @@ static inline void compensate_affine_coor1(float *x0, float *y0, int w1, int h1,
 
 /* -------------- MAIN FUNCTION ---------------------- */
 
-int compute_asift_keypoints(vector < float > const &image, int width, int height, int num_of_tilts, int verb,
-			    vector < vector < keypointslist > >&keys_all, siftPar & siftparameters)
+KeyPoints compute_asift_keypoints(vector < float > const &image, int width, int height, int num_of_tilts, int verb,
+			    siftPar & siftparameters)
 // Compute ASIFT keypoints in the input image.
 // Input:
 // image: input image
@@ -231,6 +231,7 @@ int compute_asift_keypoints(vector < float > const &image, int width, int height
 //
 // Output: the number of keypoints
 {
+	vector < vector < keypointslist > >keys_all;
 	float t_min, t_k;
 	int num_tilt, num_rot_t2;
 	int fproj_o;
@@ -476,5 +477,8 @@ int compute_asift_keypoints(vector < float > const &image, int width, int height
 	}
 	printf("%d ASIFT keypoints are detected. \n", num_keys_total);
 
-	return num_keys_total;
+	KeyPoints retval;
+	retval.count = num_keys_total;
+	retval.keys = keys_all;
+	return retval;
 }

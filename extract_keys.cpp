@@ -155,15 +155,11 @@ int main(int argc, char **argv)
 		siftPar siftparameters;
 		default_sift_parameters(siftparameters);
 
-		vector < vector < keypointslist > >keys1;
-
-		int num_keys1 = 0;
-
 		cout << "Computing keypoints on the image..." << endl;
 		time_t tstart, tend;
 		tstart = time(0);
 
-		num_keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, num_of_tilts1, verb, keys1, siftparameters);
+		KeyPoints keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, num_of_tilts1, verb, siftparameters);
 
 		tend = time(0);
 		cout << "Keypoints computation accomplished in " << difftime(tend, tstart) << " seconds." << endl;
@@ -173,7 +169,7 @@ int main(int argc, char **argv)
 		// keypoints in the 1st image
 		std::ofstream file_key1(argv[argindex + 1]);
 		if (file_key1.is_open()) {
-			stream_keys_out(file_key1, num_keys1, zoom1, keys1);
+			stream_keys_out(file_key1, keys1.count, zoom1, keys1.keys);
 		} else {
 			std::cerr << "Unable to open the file keys.";
 		}

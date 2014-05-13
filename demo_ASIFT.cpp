@@ -214,17 +214,12 @@ int main(int argc, char **argv)
 	siftPar siftparameters;
 	default_sift_parameters(siftparameters);
 
-	vector < vector < keypointslist > >keys1;
-	vector < vector < keypointslist > >keys2;
-
-	int num_keys1 = 0, num_keys2 = 0;
-
 	cout << "Computing keypoints on the two images..." << endl;
 	time_t tstart, tend;
 	tstart = time(0);
 
-	num_keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, num_of_tilts1, verb, keys1, siftparameters);
-	num_keys2 = compute_asift_keypoints(ipixels2_zoom, wS2, hS2, num_of_tilts2, verb, keys2, siftparameters);
+	KeyPoints keys1 = compute_asift_keypoints(ipixels1_zoom, wS1, hS1, num_of_tilts1, verb, siftparameters);
+	KeyPoints keys2 = compute_asift_keypoints(ipixels2_zoom, wS2, hS2, num_of_tilts2, verb, siftparameters);
 
 	tend = time(0);
 	cout << "Keypoints computation accomplished in " << difftime(tend, tstart) << " seconds." << endl;
@@ -235,7 +230,7 @@ int main(int argc, char **argv)
 	cout << "Matching the keypoints..." << endl;
 	tstart = time(0);
 	num_matchings = compute_asift_matches(num_of_tilts1, num_of_tilts2, wS1, hS1, wS2,
-					      hS2, verb, keys1, keys2, matchings, siftparameters);
+					      hS2, verb, keys1.keys, keys2.keys, matchings, siftparameters);
 	tend = time(0);
 	cout << "Keypoints matching accomplished in " << difftime(tend, tstart) << " seconds." << endl;
 
@@ -325,7 +320,7 @@ int main(int argc, char **argv)
 	// keypoints in the 1st image
 	std::ofstream file_key1(argv[6]);
 	if (file_key1.is_open()) {
-		stream_keys_out(file_key1, num_keys1, zoom1, keys1);
+		stream_keys_out(file_key1, keys1.count, zoom1, keys1.keys);
 	} else {
 		std::cerr << "Unable to open the file keys1.";
 	}
@@ -335,7 +330,7 @@ int main(int argc, char **argv)
 	////// keypoints in the 2nd image
 	std::ofstream file_key2(argv[7]);
 	if (file_key2.is_open()) {
-		stream_keys_out(file_key2, num_keys2, zoom2, keys2);
+		stream_keys_out(file_key2, keys2.count, zoom2, keys2.keys);
 	} else {
 		std::cerr << "Unable to open the file keys2.";
 	}

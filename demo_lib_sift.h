@@ -85,6 +85,12 @@ typedef keypoint_template<unsigned char> keypoint_char;
 /* List of keypoints: just use the standard class vector: */
 typedef std::vector < keypoint > keypointslist;
 
+class KeyPoints {
+public:
+	vector < vector < keypointslist > >keys;
+	size_t count;
+};
+
 /* List of keypoints: just use the standard class vector: */
 typedef std::vector<keypoint_char> keypointslist_char;
 typedef std::vector<keypoint_short> keypointslist_short;
