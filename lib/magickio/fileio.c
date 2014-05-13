@@ -10,13 +10,15 @@ size_t read_file(unsigned char **file_data_ptr, char const *filename)
 		return 0;
 	}
 
-	size_t allocated = 4096 * 1024;
+	fseek(in, 0, SEEK_END);
+	size_t allocated = ftell(in);
 	unsigned char *file_data = malloc(allocated);
 
+	rewind(in);
 	size_t used = fread(file_data, 1, allocated, in);
 	while (used > 0 && !feof(in)) {
 		if (used >= allocated) {
-			allocated += 4096 * 1024;
+			allocated += 4096;
 			file_data = realloc(file_data, allocated);
 		}
 		used += fread(file_data + used, 1, allocated - used, in);
